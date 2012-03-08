@@ -1,98 +1,123 @@
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>TrackingTally</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <head>
+        <meta charset="utf-8">
+        <title> TrackingTally </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
 
-    <link href='http://fonts.googleapis.com/css?family=Miltonian' rel='stylesheet' type='text/css'>
-    
-    <!-- Le styles -->
-    <link href="./bootstrap/css/bootstrap.css" rel="stylesheet">
-    <!--<link href="./bootstrap/css/bootstrap-responsive.css" rel="stylesheet">-->
+        <link href='http://fonts.googleapis.com/css ? family=Miltonian' rel='stylesheet' type='text/css'>
 
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+        <!-- Le styles -->
+        <link href="./bootstrap/css/bootstrap.css" rel="stylesheet">
+        <link href="./bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
-    <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="images/favicon.ico">
-    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
-    
-    <link href="./style.css" rel="stylesheet">
-    
-  </head>
+        <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+          <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
 
+        <!-- Le fav and touch icons -->
+        <link rel="shortcut icon" href="images/favicon.ico">
+        <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+
+        <link href="./style.css" rel="stylesheet">
+    </head>
   <body>
     <form>
-    <div class="container-fluid">
-      <div class="entry row-fluid">
-        <div class="span10">
-            <h3>Drink Water</h3>
+    <div class="container">
+        <div class="row">
+            <div class="span6" id="entryForm">
+                <div class="entry row">
+                    <div class="span6">
+                        <h3>Drink Water</h3>
+                    </div>
+                </div>
+                <div class="data row">
+                    <div class="span6">
+                        <h3>Edit Entry</h3>
+                    </div>
+                </div>
+                <div class="data row">
+                    <div class="span6"><input type="text" class="span6" placeholder="Verb"/></div>
+                </div>
+                <div class="data row">
+                    <div class="span2"><input type="text" class="span6" placeholder="Determinative"/></div>
+                </div>
+                <div class="data row">
+                    <div class="span2"><input type="text" class="span6" placeholder="Adjective" /></div>
+                </div>
+                <div class="data row">
+                    <div class="span2"><input type="text" class="span6" placeholder="Noun" /></div>
+                </div>
+                <div class="data row">
+                    <div class="span2"><input type="text" class="span6" placeholder="Comments" /></div>
+                </div>
+                <div class="data row">
+                    <div class="span6"><h3 class="explanation">Embed position</h3><span class="image"><img src="glyphicons/png/glyphicons_192_circle_remove.png" /></span></div>
+                </div>
+                <div class="data row">
+                    <div class="span6"><h3 class="explanation">Private</h3><span class="image"><img src="glyphicons/png/glyphicons_192_circle_remove.png" /></span></div>
+                </div>
+                <div class="data row">
+                    <div class="span6"><h3 class="explanation">Cancel</h3><span class="image"><img src="glyphicons/png/glyphicons_192_circle_remove.png" /></span></div>
+                </div>
+                <div class="data row">
+                    <div class="span6"><h3 class="explanation">Save</h3><span class="image"><img src="glyphicons/png/glyphicons_192_circle_remove.png" /></span></div>
+                </div>
+
+            </div>
+            <div class="span6" id="entriesDisplay">
+                data goes here
+            </div>
         </div>
-        <div class="span2">
-            <img src="glyphicons/png/glyphicons_223_thin_right_arrow.png" />
+    </div>
+                <div class="entry row">
+                    <div class="span11">
+                        <h3>Drink Water</h3>
+                    </div>
+                    <div class="span1">
+                        <img src="glyphicons/png/glyphicons_223_thin_right_arrow.png" />
+                    </div>
+                </div>
+                <div class="active row">
+                    <div class="span10">
+                        <h3>Edit Entry</h3>
+                    </div>
+                    <div class="span1">
+                        <img src="glyphicons/png/glyphicons_192_circle_remove.png" />
+                    </div>
+                    <div class="span1">
+                        <img src="glyphicons/png/glyphicons_193_circle_ok.png" />
+                    </div>
+                </div>
+                <div class="data row"><div class="span2"><input type="text" class="span2" placeholder="Verb" /></div></div>
+                <div class="data row"><div class="span2"><input type="text" class="span2" placeholder="Determinative" /></div>
+                <div class="data row"><div class="span2"><input type="text" class="span2" placeholder="Adjective"/></div></div>
+                <div class="data row"><div class="span2"><input type="text" class="span2" placeholder="Noun"/></div></>div>
+                <div class="data row"><div class="span2"><input type="text" class="span2" placeholder="Comments"/></div></div>
+      <div class="data row">
         </div>
-      </div>
-      <div class="active row-fluid">
-        <div class="span8">
-            <h3>Edit Entry</h3>
-        </div>
-        <div class="span2">
-            <img src="glyphicons/png/glyphicons_192_circle_remove.png" />
-        </div>        
-        <div class="span2">
-            <img src="glyphicons/png/glyphicons_193_circle_ok.png" />
-        </div>        
-      </div>
-      <div class="data row-fluid">
-        <div class="span12">
-            <input type="text" class="span11" placeholder="Verb"/>
-        </div>      
-      </div>
-      <div class="data row-fluid">
-        <div class="span12">
-            <input type="text" class="span11" placeholder="Determinative"/>
-        </div>      
-      </div>
-      <div class="data row-fluid">
-        <div class="span12">
-            <input type="text" class="span11" placeholder="Adjective"/>
-        </div>      
-      </div>
-      <div class="data row-fluid">
-        <div class="span12">
-            <input type="text" class="span11" placeholder="Noun"/>
-        </div>      
-      </div>
-      <div class="data row-fluid">
-        <div class="span12">
-            <input type="text" class="span11" placeholder="Comments"/>
-        </div>      
-      </div>
-      <div class="data row-fluid">
+    <div class="data row">
         <div class="span10">
             <h3>Private</h3>
-        </div>      
+        </div>
         <div class="span2">
             <img src="glyphicons/png/glyphicons_198_ok.png" />
         </div>
       </div>
-      <div class="data row-fluid">
+      <div class="data row">
         <div class="span10">
             <h3>Location</h3>
-        </div>      
+        </div>
         <div class="span2">
             <img src="glyphicons/png/glyphicons_198_ok.png" />
         </div>
       </div>
-      <div class="entry row-fluid">
+      <div class="entry row">
         <div class="span10">
             <h3>Drink Water</h3>
         </div>
@@ -100,59 +125,11 @@
             <img src="glyphicons/png/glyphicons_223_thin_right_arrow.png" />
         </div>
       </div>
+            </div>
+            <div class="span6" id="databaseEntries">
+            </div>
+        </div>
 
-      <!--<div class="entry row-fluid">
-        <div class="row-fluid">
-            <div class="span12">
-                <p>Drink Water</p>
-            </div>
-        </div>
-        <div class="row-fluid">
-            <div class="span1"><a href="#"><i class="icon-edit"></i></a></div>
-            <div class="span1"><a href="#"><i class="icon-minus"></i></a></div>
-            <div class="span1"><a href="#"><i class="icon-plus"></i></a></div>
-            <div class="span1"><a href="#"><i class="icon-search"></i></a></div>
-        </div>        
-      </div>      
-      <div class="entry row-fluid">
-        <div class="row-fluid">
-            <div class="span12">
-                <p>something goes here</p>
-            </div>
-        </div>
-        <div class="row-fluid">
-            <div class="span1"><a href="#"><i class="icon-edit"></i></a></div>
-            <div class="span1"><a href="#"><i class="icon-minus"></i></a></div>
-            <div class="span1"><a href="#"><i class="icon-plus"></i></a></div>
-            <div class="span1"><a href="#"><i class="icon-search"></i></a></div>
-        </div>        
-      </div>      
-      <div class="entry row-fluid">
-        <div class="row-fluid">
-            <div class="span12">
-                <p>something goes here</p>
-            </div>
-        </div>
-        <div class="row-fluid">
-            <div class="span1"><a href="#"><i class="icon-edit"></i></a></div>
-            <div class="span1"><a href="#"><i class="icon-minus"></i></a></div>
-            <div class="span1"><a href="#"><i class="icon-plus"></i></a></div>
-            <div class="span1"><a href="#"><i class="icon-search"></i></a></div>
-        </div>        
-      </div>      
-      <div class="entry row-fluid">
-        <div class="row-fluid">
-            <div class="span12">
-                <p>something goes here</p>
-            </div>
-        </div>
-        <div class="row-fluid">
-            <div class="span1"><a href="#"><i class="icon-edit"></i></a></div>
-            <div class="span1"><a href="#"><i class="icon-minus"></i></a></div>
-            <div class="span1"><a href="#"><i class="icon-plus"></i></a></div>
-            <div class="span1"><a href="#"><i class="icon-search"></i></a></div>
-        </div>        
-      </div>  -->    
     </div>    <!-- /container -->
     </form>
 

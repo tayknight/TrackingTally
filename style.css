@@ -30,7 +30,7 @@ h3.space a {
 
 hr.tight {
     margin: 5px 0;
-}   
+}
 
 .footer {
     border-top: 1px solid #eee;
@@ -52,23 +52,35 @@ hr.tight {
 /*.entry a {
     min-width: 57px;
     padding: 0 15px;
-}*/
-
-.entry {    
+}
+*/
+.entry {
     background: #BDBB9B;
-    margin-top: 3px;
+    margin: 3px 0;
+    padding: 0 5px;
 }
 
 .data {
     background-color: #DDD;
+    padding: 0 5px;
 }
 
+.image {
+    float: right;
+    min-height: 44px;
+}
+
+.explanation {
+    display: inline;
+    }
+
+/*
 .data input {
     margin-left: 5px;
 }
 
-.entry h3, .active h3, .data h3, .data input{
-    padding: 5px 0 5px 5px;
+h3.entry, h3.active, h3.data{
+    padding: 5px;
 }
 
 .entry img, .active img {
@@ -79,7 +91,7 @@ hr.tight {
     background-color: #DDD;
     margin-top: 3px;
 }
-
+*/
 /*.entry i {
     vertical-align: middle;
 }*/
