@@ -1,0 +1,53 @@
+form
+    div.container
+        div.row
+            div#entryForm.span6.accordion
+                div.entry.row.accordion-group
+                    div.span6.accordion-heading
+                        a.accordion-toggle(data-toggle:'collapse' data-parent:'#entryForm', href="#collapseOne')
+                            h3 Drink Water
+                        div#collapseOne.accordion-body.collapse
+                            something goes here
+                div.data.row
+                    div.span6
+                        a.accordion-toggle(data-toggle:'collapse' data-parent:'#entryForm', href="#collapseTwo')
+                            h3 Edit Entry
+                div#collapseTwo.accordion-body.collapse
+                    div.data.row
+                        div.span6
+                            input(type="text", placeholder="Verb").span6
+                    div.data.row
+                        div.span6
+                            input(type="text", placeholder="Quantifier").span6
+                    div.data.row
+                        div.span6
+                            input(type="text", placeholder="Adjective").span6
+                    div.data.row
+                        div.span6
+                            input(type="text", placeholder="Noun").span6
+                    div.data.row
+                        div.span6
+                            input(type="text", placeholder="Comment").span6
+                    div.data.row
+                        div.span6
+                            h3.explanation Embed Position
+                            span.image
+                                img(src="/images/glyphicons/png/glyphicons_192_circle_remove.png")
+                    div.data.row
+                        div.span6
+                            h3.explanation Public
+                            span.image
+                                img(src="/images/glyphicons/png/glyphicons_192_circle_remove.png")
+                    div.data.row                            
+                        div.span6
+                            h3.explanation Cancel
+                            span.image
+                                img(src="/images/glyphicons/png/glyphicons_192_circle_remove.png")
+                    div.data.row                            
+                        div.span6
+                            h3.explanation Save
+                            span.image
+                                img(src="/images/glyphicons/png/glyphicons_192_circle_remove.png")                            
+            div#entriesDisplay.span6
+script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js')
+script(src='/bootstrap/js/bootstrap-collapse.js')
