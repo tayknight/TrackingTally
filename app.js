@@ -3,14 +3,57 @@
  * Module dependencies.
  */
 
-var express = require('express')
+var credentials = require('./credentials.js');
+
+var sys = require('sys')
+  , express = require('express')
   , routes = require('./routes')
   , passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy;
+  , LocalStrategy = require('passport-local').Strategy
+  , mysql = require('mysql');
 
 var users = [
     { id: 1, username: 'bob', password: 'secret', email: 'bob@example.com' }
   , { id: 2, username: 'joe', password: 'birthday', email: 'joe@example.com' }
+];
+
+var db = mysql.createClient({
+    'host': credentials.host,
+    'database': credentials.database,
+    'port': 3306,
+    'user': credentials.user,
+    'password': credentials.password,
+    'debug': 'true'
+});
+
+function dbmwUse( database ) { 
+    return function( req, res, next ) { 
+        db.query( 'USE `' + database + '`' );
+        next();
+    }
+}
+
+function dbmwSelect( table, fields, extra ) {
+    sys.puts('in dbmwSelect');
+    extra = extra ? ' ' + extra : '';
+    return function( req, res, next ) {
+        req.qResult = req.qResult || new Array();
+        db.query(
+            'SELECT `' + fields.join( '`, `' )
+            + '` FROM `' + table + '`' + extra,
+            function( err, results, fields ) {
+                if ( err ) {
+                    sys.puts(err);
+                    if ( next ) next( err );
+                }
+                req.qResult.push( results );
+                if ( next ) next();
+            });
+    }
+}
+ 
+var getSomeData = [
+    dbmwSelect( 'tt_enties', [ 'id', 'verb' ], 'WHERE user_id = 1' ),
 ];
 
 function findById(id, fn) {
@@ -104,6 +147,7 @@ app.configure('production', function(){
 
 //app.get('/', routes.index);
 app.get('/', ensureAuthenticated, function(req, res) {
+    sys.puts(sys.inspect(req.user));
     res.render('index', {user: req.user});
 })
 
@@ -129,6 +173,40 @@ app.post('/login',
 app.get('/logout', function(req, res){
   req.logout();
   res.redirect('/');
+});
+
+app.get( '/entries', getSomeData, function( req, res ) {
+    sys.puts('here');
+    /*res.render( 'index', { 
+        results: req.qResult[ 0 ] 
+    }); */
+});
+ 
+// and for post data...
+ 
+app.post('/', function( req, res ) {
+    if( req.body.createData ) { 
+        db.query( 'USE `database`', function( err ) {
+            if ( err ) console.log( err );
+            function createData( ) {
+                db.query(
+                    'INSERT INTO `table` SET '
+                    + '`name` = ?, '
+                    + '`property_one` = ?, '
+                    + '`property_two` = ?, '
+                    + '`property_three` = ?',
+                    [ req.body.name,
+                    req.body.property_one,
+                    req.body.property_two,
+                    req.body.property_three ],
+
+                    function( err, info ) {
+                    if ( err ) console.log( err );
+                    res.redirect( req.url );
+                    })
+            }
+        });
+    }
 });
 
 app.listen(process.env.PORT);
