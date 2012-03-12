@@ -1,8 +1,20 @@
 doctype 5
 html
   head
-    title= title
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0m user-scalable=no")
+    meta(name="apple-mobile-web-app-capable", content="yes")
+    meta(name="description", content="")
+    meta(name="author", content="")
+    title= "TrackingTally"
     link(rel='stylesheet', href='/bootstrap/css/bootstrap.min.css')
     link(rel='stylesheet', href='/bootstrap/css/bootstrap-responsive.min.css')
-    link(rel='stylesheet', href='/stylesheets/style.css')    
+    link(rel='stylesheet', href='/stylesheets/style.css')
   body!= body
+    script
+        window.addEventListener("load",function() {
+            setTimeout(function(){
+                window.scrollTo(0, 0);
+            }, 0);
+        });
+        getUserLocation()
