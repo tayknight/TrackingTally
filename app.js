@@ -33,28 +33,42 @@ function dbmwUse( database ) {
     }
 }
 
-function dbmwSelect( table, fields, extra ) {
-    sys.puts('in dbmwSelect');
+function dbmwSelectEntries( userId, next ) {
+    sys.puts('in dbmwSelectEntries');
+    fields = ['id', 'verb'];
+    table = 'tt_entries';
+    extra = 'WHERE user_id = ' + userId;
     extra = extra ? ' ' + extra : '';
+    selectstatement = 'SELECT `' + fields.join( '`, `' ) + '` FROM `' + table + '`' + extra;
+    sys.puts(selectstatement);
     return function( req, res, next ) {
+        sys.puts('here');
         req.qResult = req.qResult || new Array();
         db.query(
-            'SELECT `' + fields.join( '`, `' )
-            + '` FROM `' + table + '`' + extra,
+            selectstatement, 
             function( err, results, fields ) {
                 if ( err ) {
                     sys.puts(err);
                     if ( next ) next( err );
                 }
+                sys.puts('found');
                 req.qResult.push( results );
-                if ( next ) next();
+                //if ( next ) next();
+                res.end(qResult);
+                //res.end(qResult);
             });
     }
 }
+
+function getEntriesData (userId) {
+    var outData = [ dbmwSelectEntries( userId ) ];
+    sys.puts(outData);
+    return outData;
+}
  
-var getSomeData = [
-    dbmwSelect( 'tt_enties', [ 'id', 'verb' ], 'WHERE user_id = 1' ),
-];
+/*var getSomeData = [
+    dbmwSelectEntries( req.user.id ),
+];*/
 
 function findById(id, fn) {
   var idx = id - 1;
@@ -122,6 +136,7 @@ var app = module.exports = express.createServer();
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
+  //app.set('view options', { layout: false });
   app.use(express.bodyParser());
   app.use(express.cookieParser());
   app.use(express.session({secret: "FtHCfm1r4f"}));
@@ -147,7 +162,6 @@ app.configure('production', function(){
 
 //app.get('/', routes.index);
 app.get('/', ensureAuthenticated, function(req, res) {
-    sys.puts(sys.inspect(req.user));
     res.render('index', {user: req.user});
 })
 
@@ -175,11 +189,22 @@ app.get('/logout', function(req, res){
   res.redirect('/');
 });
 
-app.get( '/entries', getSomeData, function( req, res ) {
-    sys.puts('here');
+app.get( '/entries', ensureAuthenticated, function( req, res ) {    
+    sys.puts(JSON.stringify(req.headers));
+    if (req.headers["x-requested-with"] == "XMLHttpRequest") {
+        dbmwSelectEntries(req.user.id, function(req, res) {
+            sys.puts('in callback');
+            res.send(JSON.stringify(res));
+        })
+    } else {
+        sys.puts('entryies by normal get');
+        res.render('entrylist');
+    }
+    //sys.puts(JSON.stringify(req.qResult[0]));
     /*res.render( 'index', { 
-        results: req.qResult[ 0 ] 
+        //results: req.qResult[ 0 ] 
     }); */
+    
 });
  
 // and for post data...
