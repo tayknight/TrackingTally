@@ -1,5 +1,18 @@
-extends extend-layout
-
-block entries
-    div#entriesDisplay.span6
-        List of entries goes here.
+table.table.table-bordered
+    thead
+        tr
+            th Verb
+            th Quant
+            th Adj
+            th Noun
+            th Comments
+            th
+    each entry in entries
+        tr
+            td= entry.verb
+            td= entry.quantifier
+            td= entry.adjective
+            td= entry.noun
+            td= entry.comments
+            td
+                img(src="/images/glyphicons/png/glyphicons_190_circle_plus.png")

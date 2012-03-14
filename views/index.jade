@@ -1,10 +1,10 @@
 div.container
     div.row
         div.span12
-            h2.center TrackingTally
-
-    form
-        div.row
+            h2.center TrackingTally 
+    div.row
+        form#entryForm 
+            input(type='hidden', id='user_id', value=user.id)
             div#entryForm.span6
                 div.data.row
                     div.data.row
@@ -43,25 +43,11 @@ div.container
                             span.image
                                 img(src="/images/glyphicons/png/glyphicons_192_circle_remove.png")
 
-            //- div#entryForm.span6.accordion
-            //-     div.entry.row.accordion-group
-            //-         div.span6.accordion-heading
-            //-             a.accordion-toggle(data-toggle='collapse', data-parent='#entryForm', href="#collapseOne')
-            //-                 h3 Drink Water
-            //-             div#collapseOne.accordion-body.collapse
-            //-                 something goes here
-            //-     div.data.row
-            //-         div.span6
-            //-             a.accordion-toggle(data-toggle='collapse', data-parent='#entryForm', href="#collapseTwo')
-            //-                 h3 Edit Entry
-            //-     div#collapseTwo.accordion-body.collapse
-
-            div#entriesDisplay.span6
-                List of entries goes here.
+        div#entriesDisplay.span6.entries
+            partial('entries')
 script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js')
 script(src='/javascript/location.js')
 script(src='/javascript/entries.js')
-//- script(src='/bootstrap/js/bootstrap-collapse.js')
 script
     getUserLocation();
     getUsersEntries();

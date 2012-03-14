@@ -3,72 +3,33 @@
  * Module dependencies.
  */
 
-var credentials = require('./credentials.js');
+//var credentials = require('./credentials.js');
 
-var sys = require('sys')
+var util = require('util')
   , express = require('express')
   , routes = require('./routes')
   , passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy
-  , mysql = require('mysql');
+  , sequelize = require('./model.js')
 
 var users = [
     { id: 1, username: 'bob', password: 'secret', email: 'bob@example.com' }
   , { id: 2, username: 'joe', password: 'birthday', email: 'joe@example.com' }
 ];
 
-var db = mysql.createClient({
-    'host': credentials.host,
-    'database': credentials.database,
-    'port': 3306,
-    'user': credentials.user,
-    'password': credentials.password,
-    'debug': 'true'
-});
-
-function dbmwUse( database ) { 
-    return function( req, res, next ) { 
-        db.query( 'USE `' + database + '`' );
-        next();
-    }
+function dbSelectEntries(userId, next) {
+    util.puts('in dbSelectEntries for person_id: ' + userId);
+    sequelize.Person.find(parseInt(userId)).success(function(thisPerson) {
+        sequelize.Entry.all({where: {person_id: thisPerson.id}, order: 'updatedAt DESC'}).success(function(theseEntries) {
+            util.puts('found');
+            //res.entries = theseEntries;
+            next(theseEntries);
+        }).error(function(error, next) {
+            util.puts('error: ' + error);
+            next();
+        })
+    });
 }
-
-function dbmwSelectEntries( userId, next ) {
-    sys.puts('in dbmwSelectEntries');
-    fields = ['id', 'verb'];
-    table = 'tt_entries';
-    extra = 'WHERE user_id = ' + userId;
-    extra = extra ? ' ' + extra : '';
-    selectstatement = 'SELECT `' + fields.join( '`, `' ) + '` FROM `' + table + '`' + extra;
-    sys.puts(selectstatement);
-    return function( req, res, next ) {
-        sys.puts('here');
-        req.qResult = req.qResult || new Array();
-        db.query(
-            selectstatement, 
-            function( err, results, fields ) {
-                if ( err ) {
-                    sys.puts(err);
-                    if ( next ) next( err );
-                }
-                sys.puts('found');
-                req.qResult.push( results );
-                //if ( next ) next();
-                res.end(qResult);
-                //res.end(qResult);
-            });
-    }
-}
-
-function getEntriesData (userId) {
-    var outData = [ dbmwSelectEntries( userId ) ];
-    sys.puts(outData);
-    return outData;
-}
- 
-/*var getSomeData = [
-    dbmwSelectEntries( req.user.id ),
-];*/
 
 function findById(id, fn) {
   var idx = id - 1;
@@ -189,22 +150,12 @@ app.get('/logout', function(req, res){
   res.redirect('/');
 });
 
-app.get( '/entries', ensureAuthenticated, function( req, res ) {    
-    sys.puts(JSON.stringify(req.headers));
-    if (req.headers["x-requested-with"] == "XMLHttpRequest") {
-        dbmwSelectEntries(req.user.id, function(req, res) {
-            sys.puts('in callback');
-            res.send(JSON.stringify(res));
-        })
-    } else {
-        sys.puts('entryies by normal get');
-        res.render('entrylist');
-    }
-    //sys.puts(JSON.stringify(req.qResult[0]));
-    /*res.render( 'index', { 
-        //results: req.qResult[ 0 ] 
-    }); */
-    
+app.get( '/entries/user/:id', function( req, res ) {
+    util.puts(req.params.id);
+    u = req.params.id;
+    dbSelectEntries(u, function(theseEntries) {
+        res.render('entries', {layout: false, entries: theseEntries});
+    });    
 });
  
 // and for post data...
@@ -234,7 +185,7 @@ app.post('/', function( req, res ) {
     }
 });
 
-app.listen(process.env.PORT);
+app.listen(1581);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 
 

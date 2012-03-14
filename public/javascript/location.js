@@ -8,7 +8,7 @@ function getUserLocation() {
 
 function displayLocation(position) {
     //build text string including co-ordinate data passed in parameter
-    var displayText = "Position Found. Embed.";
+    var displayText = "Position Found. Embed?";
 
     //display the string for demonstration
     document.getElementById("position").innerHTML = displayText;
