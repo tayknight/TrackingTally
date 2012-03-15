@@ -39,9 +39,12 @@ this.Entry = this.sequelize.define('tt_entries', {
     latitude: Sequelize.FLOAT,
     longitude: Sequelize.FLOAT,
     public: Sequelize.BOOLEAN,
-    comments: Sequelize.TEXT
+    comment: Sequelize.TEXT
 }
 , {instanceMethods: {mapAttributes: map_attributes}})
+
+this.Person.hasMany(this.Entry)
+this.Entry.belongsTo(this.Person)
 
 module.exports = this;
 //module.exports = Person;

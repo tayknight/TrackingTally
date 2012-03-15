@@ -160,27 +160,29 @@ app.get( '/entries/user/:id', function( req, res ) {
  
 // and for post data...
  
-app.post('/', function( req, res ) {
-    if( req.body.createData ) { 
-        db.query( 'USE `database`', function( err ) {
-            if ( err ) console.log( err );
-            function createData( ) {
-                db.query(
-                    'INSERT INTO `table` SET '
-                    + '`name` = ?, '
-                    + '`property_one` = ?, '
-                    + '`property_two` = ?, '
-                    + '`property_three` = ?',
-                    [ req.body.name,
-                    req.body.property_one,
-                    req.body.property_two,
-                    req.body.property_three ],
-
-                    function( err, info ) {
-                    if ( err ) console.log( err );
-                    res.redirect( req.url );
-                    })
-            }
+app.post('/update', ensureAuthenticated, function( req, res ) {
+    console.log(req.user.id);
+    if (req.body.verb) {
+        var query = sequelize.Person.find(parseInt(req.user.id));
+        query.on('success', function(result) {
+            var entry = sequelize.Entry.build({
+                person_id: req.user.id
+                , verb: req.body.verb
+                , quantifier: req.body.quantifier
+                , adjective: req.body.adjective
+                , noun: req.body.noun
+                , comment: req.body.comment
+                , latitude: req.body.latitude
+                , longitude: req.body.longitude
+            });
+            entry.save().on('success', function() {
+                util.puts('successfully saved');
+                res.json({status:'success'}
+                ).on('failure', function(error) {
+                    util.puts('failure: ' + error);
+                    res.send(error, 500);
+                });
+            })
         });
     }
 });

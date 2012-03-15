@@ -3,15 +3,19 @@ function getUserLocation() {
     if (navigator.geolocation)
         navigator.geolocation.getCurrentPosition(displayLocation, displayError);
     else
-        document.getElementById("position").innerHTML = "Position not found";
+        document.getElementById("position").innerHTML = "Location not found";
 }
 
 function displayLocation(position) {
+    console.log('position found');
     //build text string including co-ordinate data passed in parameter
-    var displayText = "Position Found. Embed?";
+    /*var displayText = "Include location";    
 
     //display the string for demonstration
     document.getElementById("position").innerHTML = displayText;
+    $('#entrylatitude').val(position.coords.latitude);
+    $('#entrylongitude').val(position.coords.longitude);
+    */
 }
 
 function displayError(error) {
@@ -24,15 +28,15 @@ function displayError(error) {
             locationElement.innerHTML = "Permission was denied";
         break;
     case error.POSITION_UNAVAILABLE:
-        locationElement.innerHTML = "Location data not available";
+        locationElement.innerHTML = "Location not available";
         break;
     case error.TIMEOUT:
-        locationElement.innerHTML = "Location request timeout";
+        locationElement.innerHTML = "Location req. timeout";
         break;
     case error.UNKNOWN_ERROR:
-        locationElement.innerHTML = "Position error.";
+        locationElement.innerHTML = "Location error.";
         break;
-    default: locationElement.innerHTML = "Position Error.";
+    default: locationElement.innerHTML = "Location Error.";
         break;
     }
 }

@@ -3,51 +3,47 @@ div.container
         div.span12
             h2.center TrackingTally 
     div.row
-        form#entryForm 
-            input(type='hidden', id='user_id', value=user.id)
-            div#entryForm.span6
-                div.data.row
+        // leave empty
+    div.row
+        div.span6
+            form(id='entryForm', action='/', method='post')
+                input(type='hidden', id='user_id', value=user.id)
+                div#entryForm
                     div.data.row
                         div.span6
-                            input(type="text", placeholder="Verb").span6
+                            input(type="text", placeholder="Verb", id="entryverb").span6
                     div.data.row
                         div.span6
-                            input(type="text", placeholder="Quantifier").span6
+                            input(type="text", placeholder="Quantifier", id="entryquantifier").span6
                     div.data.row
                         div.span6
-                            input(type="text", placeholder="Adjective").span6
+                            input(type="text", placeholder="Adjective", id="entryadjective").span6
                     div.data.row
                         div.span6
-                            input(type="text", placeholder="Noun").span6
+                            input(type="text", placeholder="Noun", id="entrynoun").span6
                     div.data.row
                         div.span6
-                            input(type="text", placeholder="Comment").span6
+                            input(type="text", placeholder="Comment", id="entrycomment").span6
+                    //div.data.row
+                    //    div.span6
+                    //        h3#position.explanation
+                            input(type="hidden", id="entrylatitude")
+                            input(type="hidden", id="entrylongitude")                            
+                    //div.data.row
+                    //    div.span6
+                    //        h3.explanation Public
                     div.data.row
                         div.span6
-                            h3#position.explanation
-                            span.image
-                                img(src="/images/glyphicons/png/glyphicons_192_circle_remove.png")
-                    div.data.row
-                        div.span6
-                            h3.explanation Public
-                            span.image
-                                img(src="/images/glyphicons/png/glyphicons_192_circle_remove.png")
-                    div.data.row
-                        div.span6
-                            h3.explanation Cancel
-                            span.image
-                                img(src="/images/glyphicons/png/glyphicons_192_circle_remove.png")
-                    div.data.row
-                        div.span6
-                            h3.explanation Save
-                            span.image
-                                img(src="/images/glyphicons/png/glyphicons_192_circle_remove.png")
-
+                            input(type='button', class='btn btn-primary btn-large', value="Cancel")
+                            input(type='submit', class='btn btn-primary btn-large').pull-right
+                                
         div#entriesDisplay.span6.entries
             partial('entries')
 script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js')
+script(src='/bootstrap/js/bootstrap-collapse.js')
 script(src='/javascript/location.js')
 script(src='/javascript/entries.js')
 script
     getUserLocation();
     getUsersEntries();
+    initializeSaveHandler();

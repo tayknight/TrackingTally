@@ -1,18 +1,42 @@
-table.table.table-bordered
+ul.pager
+    li.previous
+        a(href="#") Older
+    li.pagination-centered
+        a(href="#").active Mar. 15, 2012
+    li.next.disabled
+        a(href="#") Newer
+//-
+    div.navbar
+        div.navbar-inner
+            div.container
+                a(data-toggle='collapse', data-target='.nav-collapse').btn.btn-navbar
+                    span.icon-bar
+                    span.icon-bar
+                    span.icon-bar
+                
+                a.brand(href='#') Entries
+                div.nav-collapse
+                    ul.nav
+                        li 
+                            a(id='yesterdayLink', href="#") Previous
+                        li
+                            a(id='todayLink', href="#") Next
+table.table.table-bordered.table-condensed.table-striped
     thead
         tr
             th Verb
             th Quant
             th Adj
             th Noun
-            th Comments
+            // th Comment
             th
     each entry in entries
-        tr
-            td= entry.verb
-            td= entry.quantifier
-            td= entry.adjective
-            td= entry.noun
-            td= entry.comments
+        tr(id="entry_row_" + entry.id).entryRow
+            td.verb= entry.verb
+            td.quantifier= entry.quantifier
+            td.adjective= entry.adjective
+            td.noun= entry.noun
+            // td.comment= entry.comment
             td
-                img(src="/images/glyphicons/png/glyphicons_190_circle_plus.png")
+                a(id=entry.id).placeEntry
+                    img(src="/images/glyphicons/png/glyphicons_190_circle_plus.png")

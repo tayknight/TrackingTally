@@ -37,6 +37,10 @@ hr.tight {
   border-top: 1px solid #eee;
   padding-top: 5px;
 }
+#entryForm,
+#entriesDisplay {
+  margin-top: 10px;
+}
 input[type=text] {
   font-size: 18px;
 }
@@ -46,14 +50,17 @@ input[type=text] {
   margin-bottom: 3px;
   padding: 0 5px;
 }
-.data {
-  background-color: #ddd;
-  padding: 0 5px;
-}
 .image {
   float: right;
   min-height: 44px;
 }
 .explanation {
   display: inline;
+}
+.placeEntry {
+  cursor: pointer;
+}
+.entrySave {
+  cursor: pointer;
+  text-decoration: none;
 }
