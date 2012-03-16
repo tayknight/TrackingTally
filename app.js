@@ -10,26 +10,15 @@ var util = require('util')
   , routes = require('./routes')
   , passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy
-  , sequelize = require('./model.js')
+  , model = require('./model.js')
+  , moment = require('moment')
 
 var users = [
     { id: 1, username: 'bob', password: 'secret', email: 'bob@example.com' }
   , { id: 2, username: 'joe', password: 'birthday', email: 'joe@example.com' }
 ];
 
-function dbSelectEntries(userId, next) {
-    util.puts('in dbSelectEntries for person_id: ' + userId);
-    sequelize.Person.find(parseInt(userId)).success(function(thisPerson) {
-        sequelize.Entry.all({where: {person_id: thisPerson.id}, order: 'updatedAt DESC'}).success(function(theseEntries) {
-            util.puts('found');
-            //res.entries = theseEntries;
-            next(theseEntries);
-        }).error(function(error, next) {
-            util.puts('error: ' + error);
-            next();
-        })
-    });
-}
+var db = new model();
 
 function findById(id, fn) {
   var idx = id - 1;
@@ -150,11 +139,31 @@ app.get('/logout', function(req, res){
   res.redirect('/');
 });
 
-app.get( '/entries/user/:id', function( req, res ) {
-    util.puts(req.params.id);
+/*app.get( '/entries/user/:id', function( req, res ) {
+    var today = new Date();
     u = req.params.id;
-    dbSelectEntries(u, function(theseEntries) {
-        res.render('entries', {layout: false, entries: theseEntries});
+    d = req.params.date;
+    dummyDate = 'START';
+    db.dbSelectEntries(u, dummyDate, function(theseEntries) {
+        res.render('entries', {layout: false, entries: theseEntries, requested: 'All', today: today});
+    });    
+});*/
+
+app.get( '/entries/user/:id/:date', function( req, res ) {
+    var today = new Date();
+    u = req.params.id;
+    d = req.params.date;
+    var thisDate = new Date(req.params.date);
+    util.puts(thisDate);
+    dateFormat = 'MMM DD, YYYY';
+    db.dbSelectEntries(u, thisDate, function(theseEntries) {
+        res.render('entries', {layout: false
+            , entries: theseEntries
+            , requested: thisDate
+            , today: today
+            , requestedDisplay: moment(new Date(thisDate)).format(dateFormat)
+            , todayDisplay: moment(new Date(today)).format(dateFormat)
+            });
     });    
 });
  
@@ -163,9 +172,9 @@ app.get( '/entries/user/:id', function( req, res ) {
 app.post('/update', ensureAuthenticated, function( req, res ) {
     console.log(req.user.id);
     if (req.body.verb) {
-        var query = sequelize.Person.find(parseInt(req.user.id));
+        var query = db.Person.find(parseInt(req.user.id));
         query.on('success', function(result) {
-            var entry = sequelize.Entry.build({
+            var entry = db.Entry.build({
                 person_id: req.user.id
                 , verb: req.body.verb
                 , quantifier: req.body.quantifier

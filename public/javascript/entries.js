@@ -1,12 +1,19 @@
-var getUsersEntries =  function() {
+var getUsersEntries =  function(fetchDate) {
+    if (!fetchDate) {
+        var t = $('#today').html();
+        fetchDate = moment(new Date(t)).format('YYYY-MM-DD');
+        console.log(fetchDate);
+    }
     $("#entriesDisplay").html();
     $.ajax({
-        url: '/entries/user/' + $("#user_id").val()
+        url: '/entries/user/' + $("#user_id").val() + '/' + fetchDate
         , type: 'get'
         , dataType: 'html'
         , success: function(data) {
                     $("#entriesDisplay").html(data);
                     initializeEntryClickHandler();
+                    initializeOlderClickHandler();
+                    initializeNewerClickHandler();
                     }
     });
 }
@@ -27,11 +34,29 @@ var placeExistingEntry = function(thisId) {
     $('#entryverb').focus();
 };
 
+var initializeOlderClickHandler = function() {
+    $('#olderButton').click(function() {    
+        var t = $('#today').html();
+        fetchDate = moment(new Date(t)).add('d', -1).format('YYYY-MM-DD');
+        getUsersEntries(fetchDate);
+    });
+};
+
+var initializeNewerClickHandler = function() {
+    $('#newerButton').click(function() {    
+        var t = $('#today').html();
+        fetchDate = moment(new Date(t)).add('d', 1).format('YYYY-MM-DD');
+        getUsersEntries(fetchDate);
+    });
+};
+
 var initializeEntryClickHandler = function() {
     $('.placeEntry').click(function() { placeExistingEntry($(this).attr('id')) })
 }
 
 var initializeSaveHandler = function() {
+    var t = $('#today').html();
+    var fetchDate = moment(new Date(t)).format('YYYY-MM-DD');
     $('#entryForm').submit(function() {
         /* stop form from submitting normally */
         event.preventDefault(); 
@@ -52,10 +77,29 @@ var initializeSaveHandler = function() {
         , url: '/update'
         , data: formdata
         , success: function() {
-            getUsersEntries();
+            $('#entryForm').clearForm();
+            getUsersEntries(fetchDate);
           }
         , dataType: ''
     })
         return false;
     });    
 }
+
+var initilizeCancelHandler = function() {
+    $('#cancelButton').click(function() { $('#entryForm').clearForm() });
+}
+
+$.fn.clearForm = function() {
+    return this.each(function() {
+        var type = this.type, tag = this.tagName.toLowerCase();
+        if (tag == 'form')
+            return $(':input',this).clearForm();
+        if (type == 'text' || type == 'password' || tag == 'textarea')
+            this.value = '';
+        else if (type == 'checkbox' || type == 'radio')
+        this.checked = false;
+        else if (tag == 'select')
+        this.selectedIndex = -1;
+    });
+};

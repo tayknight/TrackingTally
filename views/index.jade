@@ -34,7 +34,7 @@ div.container
                     //        h3.explanation Public
                     div.data.row
                         div.span6
-                            input(type='button', class='btn btn-primary btn-large', value="Cancel")
+                            input(type='button', id='cancelButton', class='btn btn-primary btn-large', value="Cancel")
                             input(type='submit', class='btn btn-primary btn-large').pull-right
                                 
         div#entriesDisplay.span6.entries
@@ -43,7 +43,13 @@ script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js')
 script(src='/bootstrap/js/bootstrap-collapse.js')
 script(src='/javascript/location.js')
 script(src='/javascript/entries.js')
+script(src='/javascript/moment.min.js')
 script
+    var today = new Date();
+    dateFormat = 'MMM DD, YYYY';
     getUserLocation();
-    getUsersEntries();
+    getUsersEntries(moment(new Date(today)).format(dateFormat));
+    initializeOlderClickHandler();
+    initializeNewerClickHandler();
     initializeSaveHandler();
+    initilizeCancelHandler();

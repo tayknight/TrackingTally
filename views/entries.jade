@@ -1,10 +1,12 @@
+span.hidden#today= today
+span.hidden#requested= requested
 ul.pager
     li.previous
-        a(href="#") Older
+        a#olderButton.moveDate Older
     li.pagination-centered
-        a(href="#").active Mar. 15, 2012
+        a(href="#").active Today
     li.next.disabled
-        a(href="#") Newer
+        a#newerButton.moveDate Newer
 //-
     div.navbar
         div.navbar-inner
@@ -18,10 +20,13 @@ ul.pager
                 div.nav-collapse
                     ul.nav
                         li 
-                            a(id='yesterdayLink', href="#") Previous
+                            a(id='yesterdayLink') Previous
                         li
-                            a(id='todayLink', href="#") Next
+                            a(id='nextLink') Next
 table.table.table-bordered.table-condensed.table-striped
+    thead
+        tr
+            caption= requestedDisplay
     thead
         tr
             th Verb
