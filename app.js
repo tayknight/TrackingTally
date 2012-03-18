@@ -14,11 +14,13 @@ var util = require('util')
   , moment = require('moment')
 
 var users = [
-    { id: 1, username: 'bob', password: 'secret', email: 'bob@example.com' }
+    { id: 1, username: 'bob', password: 'bob', email: 'bob@example.com' }
   , { id: 2, username: 'joe', password: 'birthday', email: 'joe@example.com' }
 ];
 
 var db = new model();
+
+var defaultEntriesPageLength = 10;
 
 function findById(id, fn) {
   var idx = id - 1;
@@ -149,6 +151,41 @@ app.get('/logout', function(req, res){
     });    
 });*/
 
+
+
+app.get('/entries/user/:id/page/:page', function(req,res) {
+    var today = new Date();
+    u = req.params.id;
+    p = req.params.page;
+    
+    // get the user's number of entries
+    db.dbGetNumberOfEntries(u, function(entriesCount) {
+        if (entriesCount > 0) {
+          db.dbSelectEntriesPage(u, p, defaultEntriesPageLength, function(theseEntries) {
+              res.render('entries', {layout: false
+                  , entriesCount: entriesCount
+                  , entries: theseEntries
+                  , requested: p
+                  , defaultEntriesPageLength: defaultEntriesPageLength
+                  , today: today
+                  , requestedDisplay: null
+                  , todayDisplay: null
+                  })
+          })
+        } else {
+          res.render('entries', {layout:false
+              , entriesCount: 0
+              , entries: null
+              , requested: p
+              , defaultEntriesPageLength: defaultEntriesPageLength
+              , today: today
+              , requestedDisplay: null
+              , todayDisplay: null
+            })
+        } 
+    })
+});
+
 app.get( '/entries/user/:id/:date', function( req, res ) {
     var today = new Date();
     u = req.params.id;
@@ -168,7 +205,6 @@ app.get( '/entries/user/:id/:date', function( req, res ) {
 });
  
 // and for post data...
- 
 app.post('/update', ensureAuthenticated, function( req, res ) {
     console.log(req.user.id);
     if (req.body.verb) {

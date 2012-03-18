@@ -94,13 +94,13 @@ var Model = function() {
         });
     }
     
-    this.dbSelectEntriesPage = function(userId, page, pageLength, next) {        
+    this.dbSelectEntriesPage = function(userId, page, next) {        
         entities.person.find(parseInt(userId)).success(function(thisPerson) {
             whereClause = ['person_id=?', thisPerson.id];
             entities.entry.all({
             where: whereClause
-            , offset: pageLength*(parseInt(page)-1)
-            , limit: pageLength
+            , offset: 50*(parseInt(page)-1)
+            , limit: 50
             , order: 'createdAt DESC'
             }
             ).success(function(theseEntries) {

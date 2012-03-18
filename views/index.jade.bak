@@ -38,7 +38,7 @@ div.container
                             input(type='submit', class='btn btn-primary btn-large').pull-right
                                 
         div#entriesDisplay.span6.entries
-          p Please wait. Loading...
+            Please Wait
 script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js')
 script(src='/bootstrap/js/bootstrap-collapse.js')
 script(src='/javascript/location.js')
