@@ -196,9 +196,8 @@ app.post('/update', ensureAuthenticated, function( req, res ) {
     }
 });
 
-var port = process.env.PORT || 1581;
-app.listen(port);
-console.log("Express server listening on port %d in %s mode", port, app.settings.env);
+app.listen(app.address().port);
+console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 
 
 // Simple route middleware to ensure user is authenticated.
