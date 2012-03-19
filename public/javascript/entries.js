@@ -90,6 +90,78 @@ var initilizeCancelHandler = function() {
     $('#cancelButton').click(function() { $('#entryForm').clearForm() });
 }
 
+var makePagination = function(requested, total_entries) {
+    var requested = parseInt(requested);
+    var total_entries = parseInt(total_entries);
+    var limit = 10;
+    var total_pages = Math.ceil(total_entries/limit);
+    var previous = requested - 1;
+    var next = requested + 1;
+    var totalminusone = total_pages - 1;
+    
+    //$('#entriesPagination').append("<div class='pagination'><ul>");
+    var parent_ul = $("<ul></ul>");
+
+    if (total_pages > 1) {
+        if (requested > 1) {
+            parent_ul.append('<li><a href="#">Prev</a></li>');
+        }
+        else {
+            parent_ul.append('<li class="disabled"><a href="#">Prev</a></li>');            
+        }
+    
+        
+        if (total_pages <= 3 { // don't bother
+            for (var counter = 1; counter <= total_pages; counter++) {
+                if (counter == requested) {
+                    parent_ul.append('<li class="active"><a href="#">' + counter + '</a></li>');
+                }
+                else {
+                    parent_ul.append('<li><a href="#">' + counter + '</a></li>');
+                }
+            }
+        }
+        
+        else if (total_pages > 4 + (adjacents * 2)) {
+            if (requested < 1 + (adjacents * 2)) {
+                for (var counter = 1; counter < 3 + (adjacents * 2); counter++) {
+                    if (counter == requested) {
+                        parent_ul.append('<li class="active"><a href="#">' + counter + '</a></li>');
+                    }
+                    else {
+                        parent_ul.append('<li><a href="#">' + counter + '</a></li>');
+                    }
+                }
+                parent_ul.append('<li><a href="#">...</a></li>');
+                parent_ul.append('<li><a href="#">' + totalminusone + '</a></li>');
+                parent_ul.append('<li><a href="#">' + total_entries + '</a></li>');
+            }
+        }
+        else {
+            parent_ul.append('<li><a href="#">1</a></li>');
+            parent_ul.append('<li><a href="#">2</a></li>');
+            parent_ul.append('<li><a href="#">3</a></li>');
+            for (var counter = total_pages - (2 + (adjacents * 2)); counter <= total_pages; counter++) {
+                if (counter == requested) {
+                    parent_ul.append('<li class="counter"><a href="#">' + counter + '</a></li>');
+                }   
+                else {
+                    parent_ul.append('<li><a href="#">' + counter + '</a></li>');
+                }
+            }
+            if (requested < total_pages - 1){
+                parent_ul.append('<li><a href="#">Next</a></li>');
+            }
+            else {
+                parent_ul.append('<li class="disabled"><a href="#">Next</a></li>');
+            }
+        }
+    }
+    var pagination_div = $('<div class="pagination"></div>');
+    pagination_div.append(parent_ul);
+    $('#entriesPagination').append(pagination_div);
+}
+
 $.fn.clearForm = function() {
     return this.each(function() {
         var type = this.type, tag = this.tagName.toLowerCase();

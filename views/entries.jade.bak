@@ -2,44 +2,15 @@ span.hidden#today= today
 span.hidden#requested= requested
 span.hidden#entriesCount= entriesCount
 
-totalPages = Math.ceil(entriesCount / defaultEntriesPageLength)
+totalPages = Math.ceil(parseInt(entriesCount) / parseInt(defaultEntriesPageLength))
+requested = parseInt(requested)
+entriesCount = parseInt(entriesCount)
 
 span.hidden#totalPages= totalPages
 
 // http://stackoverflow.com/a/44844
 div.pagination
-  ul
-    if ( totalPages == 1 )
-        p
-    if ( requested > 1 )
-        li 
-            a Prev
-    if (requested == 1) 
-        li.active
-            a 1
-    else
-        li
-            a 1            
-    if ( requested > 2 )
-        if ( requested == totalPages && totalPages > 3 )
-            li
-                a= requested - 2
-        li
-            a.= requested - 1
-    if ( requested != 1 && requested != totalPages )
-        li
-            a= requested
-    if ( requested < totalPages - 1 )
-        li
-            a= requested + 1
-        if ( requested == 1 && totalPages > 3 )
-            li
-                a= requested + 2
-    li
-        a= totalPages
-    if ( requested < totalPages )
-        li
-            a Next
+  
 
 //-
     div.navbar
