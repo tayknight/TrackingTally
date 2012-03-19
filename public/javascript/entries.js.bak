@@ -92,7 +92,6 @@ var initilizeCancelHandler = function() {
 
 var makePagination = function(requested, total_entries) {
     var requested = parseInt(requested);
-    var adjacents = 1;
     var total_entries = parseInt(total_entries);
     var limit = 10;
     var total_pages = Math.ceil(total_entries/limit);
@@ -112,7 +111,7 @@ var makePagination = function(requested, total_entries) {
         }
     
         
-        /*if (total_pages < 6 + (adjacents * 2)) {
+        if (total_pages <= 3 { // don't bother
             for (var counter = 1; counter <= total_pages; counter++) {
                 if (counter == requested) {
                     parent_ul.append('<li class="active"><a href="#">' + counter + '</a></li>');
@@ -121,10 +120,11 @@ var makePagination = function(requested, total_entries) {
                     parent_ul.append('<li><a href="#">' + counter + '</a></li>');
                 }
             }
-        }   
-        else*/ if (total_pages > 4 + (adjacents * 2)) {
-            //if (requested < 1 + (adjacents * 2)) {
-                for (var counter = 1; counter <= total_pages; counter++){// 3 + (adjacents * 2); counter++) {
+        }
+        
+        else if (total_pages > 4 + (adjacents * 2)) {
+            if (requested < 1 + (adjacents * 2)) {
+                for (var counter = 1; counter < 3 + (adjacents * 2); counter++) {
                     if (counter == requested) {
                         parent_ul.append('<li class="active"><a href="#">' + counter + '</a></li>');
                     }
@@ -135,7 +135,7 @@ var makePagination = function(requested, total_entries) {
                 parent_ul.append('<li><a href="#">...</a></li>');
                 parent_ul.append('<li><a href="#">' + totalminusone + '</a></li>');
                 parent_ul.append('<li><a href="#">' + total_entries + '</a></li>');
-            //}
+            }
         }
         else {
             parent_ul.append('<li><a href="#">1</a></li>');
