@@ -157,6 +157,7 @@ app.get('/entries/user/:id/page/:page', function(req,res) {
     var today = new Date();
     u = req.params.id;
     p = req.params.page;
+    util.puts('user: ' + u + '. page: ' + p);
     
     // get the user's number of entries
     db.dbGetNumberOfEntries(u, function(entriesCount) {

@@ -1,6 +1,7 @@
 var util = require('util');
 var credentials = require('./credentials.js');
 var Sequelize = require("sequelize");
+var moment = require('moment')
 
 /**
    * @type {Object}
@@ -104,6 +105,10 @@ var Model = function() {
             , order: 'createdAt DESC'
             }
             ).success(function(theseEntries) {
+                for (var i = 0; i < theseEntries.length; i++) {
+                    theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('MMM DD, YYYY hh:mm a');
+                    theseEntries[i].updatedAt = moment(new Date(theseEntries[i].updatedAt)).format('MMM DD, YYYY hh:mm a');
+                }
                 util.puts('found');            
                 next(theseEntries);
                 })
