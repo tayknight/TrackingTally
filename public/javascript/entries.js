@@ -14,6 +14,7 @@ var getUsersEntries =  function(pageNum) {
                     initializeEntryClickHandler();
                     initializeOlderClickHandler();
                     initializeNewerClickHandler();
+                    makePagination(4, 69);
                     }
     });
 }

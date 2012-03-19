@@ -53,3 +53,4 @@ script
     initializeNewerClickHandler();
     initializeSaveHandler();
     initilizeCancelHandler();
+    makePagination(4, 69);

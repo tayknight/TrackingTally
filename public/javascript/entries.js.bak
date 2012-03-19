@@ -92,6 +92,7 @@ var initilizeCancelHandler = function() {
 
 var makePagination = function(requested, total_entries) {
     var requested = parseInt(requested);
+    var adjacents = 1;
     var total_entries = parseInt(total_entries);
     var limit = 10;
     var total_pages = Math.ceil(total_entries/limit);
@@ -110,8 +111,7 @@ var makePagination = function(requested, total_entries) {
             parent_ul.append('<li class="disabled"><a href="#">Prev</a></li>');            
         }
     
-        
-        if (total_pages <= 3 { // don't bother
+        if (total_pages < 6 + (adjacents * 2)) {
             for (var counter = 1; counter <= total_pages; counter++) {
                 if (counter == requested) {
                     parent_ul.append('<li class="active"><a href="#">' + counter + '</a></li>');
@@ -120,8 +120,7 @@ var makePagination = function(requested, total_entries) {
                     parent_ul.append('<li><a href="#">' + counter + '</a></li>');
                 }
             }
-        }
-        
+        }   
         else if (total_pages > 4 + (adjacents * 2)) {
             if (requested < 1 + (adjacents * 2)) {
                 for (var counter = 1; counter < 3 + (adjacents * 2); counter++) {
