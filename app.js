@@ -9,38 +9,27 @@ var util = require('util')
   , express = require('express')
   , routes = require('./routes')
   , passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy
   , model = require('./model.js')
   , moment = require('moment')
+  , FacebookStrategy = require('passport-facebook').Strategy;
 
-var users = [
-    { id: 1, username: 'bob', password: 'bob', email: 'bob@example.com' }
-  , { id: 2, username: 'joe', password: 'birthday', email: 'joe@example.com' }
-];
+passport.use(new FacebookStrategy({
+    clientID: '380922881926658',
+    clientSecret: '3b3303e818306a9656fa2ccea7b7d0f5',
+    callbackURL: "http://localhost:1581/auth/facebook/callback"
+    },
+    function(accessToken, refreshToken, profile, done) {
+        console.log({ facebookId: profile.id });
+        User.findOrCreate({ facebookId: profile.id }, function (err, user) {
+        if (err) { return done(err); }
+            done(null, user);
+        });
+    }
+));
 
 var db = new model();
 
 var defaultEntriesPageLength = 10;
-
-function findById(id, fn) {
-  var idx = id - 1;
-  if (users[idx]) {
-    fn(null, users[idx]);
-  } else {
-    fn(new Error('User ' + id + ' does not exist'));
-  }
-}
-
-function findByUsername(username, fn) {
-  for (var i = 0, len = users.length; i < len; i++) {
-    var user = users[i];
-    if (user.username === username) {
-      return fn(null, user);
-    }
-  }
-  return fn(null, null);
-}
-
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -63,7 +52,7 @@ passport.deserializeUser(function(id, done) {
 //   credentials (in this case, a username and password), and invoke a callback
 //   with a user object.  In the real world, this would query a database;
 //   however, in this example we are using a baked-in set of users.
-passport.use(new LocalStrategy(
+/*passport.use(new LocalStrategy(
   function(username, password, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
@@ -79,7 +68,7 @@ passport.use(new LocalStrategy(
       })
     });
   }
-));
+));*/
 
 var app = module.exports = express.createServer();
 
@@ -113,9 +102,28 @@ app.configure('production', function(){
 // Routes
 
 //app.get('/', routes.index);
-app.get('/', ensureAuthenticated, function(req, res) {
-    res.render('index', {user: req.user});
+app.get('/', function(req, res) {
+    if (req.user) {
+        res.render('user', {user: req.user});
+    }
+    else {
+        res.render('index');
+    }
 })
+
+app.get('/auth/facebook',
+  passport.authenticate('facebook'),
+  function(req, res){
+    // The request will be redirected to Facebook for authentication, so
+    // this function will not be called.
+  });
+
+app.get('/auth/facebook/callback', 
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/');
+  });
 
 app.get('/account', ensureAuthenticated, function(req, res){
   res.render('account', { user: req.user });
@@ -125,21 +133,6 @@ app.get('/login', function(req, res){
   res.render('login', { user: req.user });
 });
 
-// POST /login
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  If authentication fails, the user will be redirected back to the
-//   login page.  Otherwise, the primary route function function will be called,
-//   which, in this example, will redirect the user to the home page.
-app.post('/login',
-  passport.authenticate('local', { failureRedirect: '/login' }),
-  function(req, res) {
-    res.redirect('/');
-  });
-
-app.get('/logout', function(req, res){
-  req.logout();
-  res.redirect('/');
-});
 
 /*app.get( '/entries/user/:id', function( req, res ) {
     var today = new Date();
