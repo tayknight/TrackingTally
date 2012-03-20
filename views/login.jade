@@ -1,1 +1,9 @@
-<a href="/auth/facebook"><img src="images/login-with-facebook.png" width="154" height="22"></a>
+form(action='/login', method='POST')
+  #login
+    label(for=everyauth.password.loginFormFieldName) Login
+    input(type='text', name=everyauth.password.loginFormFieldName)
+  #password
+    label(for=everyauth.password.passwordFormFieldName) Password
+    input(type='password')
+  #submit
+    input(type='submit') login

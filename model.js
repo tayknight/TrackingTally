@@ -33,6 +33,8 @@ var Model = function() {
         firstname: Sequelize.STRING,
         lastname: Sequelize.STRING,
         email: Sequelize.STRING,
+        provider: Sequelize.STRING,
+        identifier: Sequelize.STRING
     });
 
     this.Entry = sequelize.define('tt_entries', {
@@ -54,6 +56,16 @@ var Model = function() {
     var entities = {};
     entities.person = this.Person;
     entities.entry = this.Entry;
+    
+    this.dbSelectOrCreatePerson = function(provider, identifier, next) {
+        entities.person.find({where: {provider: provider, identifier: identifier}}).success(function(thisPerson) {
+            console.log(thisPerson);
+            next();
+        }).error(function(err) {
+            util.puts(err);
+            next();
+        })
+    }
         
     this.dbSelectEntries = function(userId, thisDate, next) {        
         entities.person.find(parseInt(userId)).success(function(thisPerson) {
