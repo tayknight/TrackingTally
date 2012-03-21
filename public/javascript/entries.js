@@ -1,9 +1,4 @@
 var getUsersEntries =  function(pageNum) {
-    /*if (!fetchDate) {
-        var t = $('#today').html();
-        fetchDate = moment(new Date(t)).format('YYYY-MM-DD');
-        console.log(fetchDate);
-    }*/    
     $("#entriesDisplay").html();
     $.ajax({
         url: '/entries/user/' + $("#user_id").val() + '/page/' + pageNum
@@ -77,7 +72,7 @@ var initializeSaveHandler = function() {
         , data: formdata
         , success: function() {
             $('#entryForm').clearForm();
-            getUsersEntries(fetchDate);
+            getUsersEntries(1);
           }
         , dataType: ''
     })

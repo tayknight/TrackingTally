@@ -1,6 +1,7 @@
 var util = require('util');
 var credentials = require('./credentials.js');
 var Sequelize = require("sequelize");
+var moment = require('moment')
 
 /**
    * @type {Object}
@@ -32,6 +33,9 @@ var Model = function() {
         firstname: Sequelize.STRING,
         lastname: Sequelize.STRING,
         email: Sequelize.STRING,
+        provider: Sequelize.STRING,
+        identifier: Sequelize.STRING,
+        username: Sequelize.STRING
     });
 
     this.Entry = sequelize.define('tt_entries', {
@@ -53,6 +57,33 @@ var Model = function() {
     var entities = {};
     entities.person = this.Person;
     entities.entry = this.Entry;
+    
+    
+    
+    this.dbFindOrCreateUser = function(provider, twitterMetadata, next) {
+        entities.person.find({where: {provider: provider, identifier: twitterMetadata.id}}).success(function(thisPerson) {
+            var user = {};
+            if (thisPerson) {
+                next(null, thisPerson);
+            }
+            else {
+                var newPerson = entities.person.build({
+                    provider: provider
+                    , identifier: twitterMetadata.id
+                    , username: twitterMetadata.screen_name
+                });
+                newPerson.save().on('success', function(thisNewPerson) {
+                    next(null, thisNewPerson);  
+                }).on('failure', function(err) {
+                    util.puts(err);
+                    next(err, null);  
+                })
+            }
+        }).error(function(err) {
+            util.puts(err);
+            next(err, null);
+        })
+    }
         
     this.dbSelectEntries = function(userId, thisDate, next) {        
         entities.person.find(parseInt(userId)).success(function(thisPerson) {
@@ -94,19 +125,29 @@ var Model = function() {
         });
     }
     
-    this.dbSelectEntriesPage = function(userId, page, next) {        
+    this.dbSelectEntriesPage = function(userId, page, pageLength, next) {        
         entities.person.find(parseInt(userId)).success(function(thisPerson) {
             whereClause = ['person_id=?', thisPerson.id];
             entities.entry.all({
             where: whereClause
-            , offset: 50*(parseInt(page)-1)
-            , limit: 50
+            , offset: pageLength*(parseInt(page)-1)
+            , limit: pageLength
             , order: 'createdAt DESC'
             }
             ).success(function(theseEntries) {
-                util.puts('found');            
-                next(theseEntries);
-                })
+                if (theseEntries) {
+                    for (var i = 0; i < theseEntries.length; i++) {
+                        theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('MMM DD, YYYY hh:mm a');
+                        theseEntries[i].updatedAt = moment(new Date(theseEntries[i].updatedAt)).format('MMM DD, YYYY hh:mm a');
+                    }
+                    util.puts('found');            
+                    next(theseEntries);
+                }
+                else {
+                 theseEntries = [];
+                 next(theseEntries);      
+                }
+            })
              .error(function(error, next) {
                 util.puts('error: ' + error);
                 next();

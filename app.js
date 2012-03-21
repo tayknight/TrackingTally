@@ -24,13 +24,21 @@ everyauth.twitter
     .consumerSecret('169LM6w2KHyU1PLlLHVSj2Bhdb2BnMiEEoy7a4hv9M8')
     .findOrCreateUser(function(session, accessToken, accessTokenSecret, twitterUserMetadata) {
         var provider = 'twitter';
-        //var user = {};
-        //user.id = twitterUserMetadata.id;
-        //user.firstName = twitterUserMetadata.first_name;
-        //user.lastName = twitterUserMetadata.last_name;
-        //promise.fulfill(user);
-        // return promise;
-        return user;
+        console.log('before db call');
+            // Example 2 - Async Example
+    // var promise = this.Promise()
+    // YourUserModel.find({ login: login}, function (err, user) {
+    //   if (err) return promise.fulfill([err]);
+    //   promise.fulfill(user);
+    // }
+    // return promise;
+        var promise = this.Promise();
+        
+        db.dbFindOrCreateUser(provider, twitterUserMetadata, function(err, user) {
+            if (err) return promise.fulfill([err]);
+            promise.fulfill(user);
+        })
+        return promise;
     })
     .redirectPath('/');
 
@@ -59,9 +67,10 @@ everyauth.twitter
     .registerSuccessRedirect('/')
 */
 everyauth.everymodule.findUserById( function(userId, callback) {
-    var u = {};
-    u.id = userId;
-    return callback(null, u);
+    var user = {};
+    user.id = userId;
+    //console.log('this user is: ' + userId);
+    return callback(null, user);
 });    
 
 // everyauth.facebook
@@ -201,7 +210,7 @@ app.configure('production', function(){
 // Routes
 
 //app.get('/', routes.index);
-app.get('/', function(req, res) {
+app.get('/', ensureAuthenticated, function(req, res) {
     console.log('here');
     console.log(req.user);
     console.log('there');
@@ -327,15 +336,9 @@ var port = process.env.PORT || 1581;
 app.listen(port);
 console.log("Express server listening on port %d in %s mode", port, app.settings.env);
 
-
-function ensureAuthenticated(req, res, next) {
-    if(req.session.auth) {
-        return next();
-    }
-    else {
-        res.redirect('/login')
-    }
-  //if (req.isAuthenticated()) { return next(); }
-  //return next();
-  //
-}
+function ensureAuthenticated (req, res, next) {
+  if (!req.loggedIn) { /* `req.loggedIn` is a boolean that comes with `everyauth` */
+    return res.redirect('/auth/twitter');
+  }
+  next(); // Otherwise, pass control to your route handler
+};

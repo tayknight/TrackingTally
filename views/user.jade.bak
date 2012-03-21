@@ -48,6 +48,6 @@ script
     var today = new Date();
     dateFormat = 'MMM DD, YYYY';
     getUserLocation();
-    getUsersEntries();
+    getUsersEntries(#{everyauth.user.id});
     initializeSaveHandler();
     initilizeCancelHandler();

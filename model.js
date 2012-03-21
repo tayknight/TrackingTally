@@ -34,7 +34,8 @@ var Model = function() {
         lastname: Sequelize.STRING,
         email: Sequelize.STRING,
         provider: Sequelize.STRING,
-        identifier: Sequelize.STRING
+        identifier: Sequelize.STRING,
+        username: Sequelize.STRING
     });
 
     this.Entry = sequelize.define('tt_entries', {
@@ -57,13 +58,30 @@ var Model = function() {
     entities.person = this.Person;
     entities.entry = this.Entry;
     
-    this.dbSelectOrCreatePerson = function(provider, identifier, next) {
-        entities.person.find({where: {provider: provider, identifier: identifier}}).success(function(thisPerson) {
-            console.log(thisPerson);
-            next();
+    
+    
+    this.dbFindOrCreateUser = function(provider, twitterMetadata, next) {
+        entities.person.find({where: {provider: provider, identifier: twitterMetadata.id}}).success(function(thisPerson) {
+            var user = {};
+            if (thisPerson) {
+                next(null, thisPerson);
+            }
+            else {
+                var newPerson = entities.person.build({
+                    provider: provider
+                    , identifier: twitterMetadata.id
+                    , username: twitterMetadata.screen_name
+                });
+                newPerson.save().on('success', function(thisNewPerson) {
+                    next(null, thisNewPerson);  
+                }).on('failure', function(err) {
+                    util.puts(err);
+                    next(err, null);  
+                })
+            }
         }).error(function(err) {
             util.puts(err);
-            next();
+            next(err, null);
         })
     }
         
@@ -117,13 +135,19 @@ var Model = function() {
             , order: 'createdAt DESC'
             }
             ).success(function(theseEntries) {
-                for (var i = 0; i < theseEntries.length; i++) {
-                    theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('MMM DD, YYYY hh:mm a');
-                    theseEntries[i].updatedAt = moment(new Date(theseEntries[i].updatedAt)).format('MMM DD, YYYY hh:mm a');
+                if (theseEntries) {
+                    for (var i = 0; i < theseEntries.length; i++) {
+                        theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('MMM DD, YYYY hh:mm a');
+                        theseEntries[i].updatedAt = moment(new Date(theseEntries[i].updatedAt)).format('MMM DD, YYYY hh:mm a');
+                    }
+                    util.puts('found');            
+                    next(theseEntries);
                 }
-                util.puts('found');            
-                next(theseEntries);
-                })
+                else {
+                 theseEntries = [];
+                 next(theseEntries);      
+                }
+            })
              .error(function(error, next) {
                 util.puts('error: ' + error);
                 next();

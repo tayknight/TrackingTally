@@ -26,40 +26,41 @@ span.hidden#totalPages= totalPages
                             a(id='nextLink') Next
 
 // http://www.strangerstudios.com/sandbox/pagination/diggstyle_function.txt
-div#entriesPagination    
-each entry in entries
-    div.row
-        div.span3
-            div(id="entry_row_" + entry.id).row
-                div#verb.span3= entry.verb
-                div#quantifier.span3= entry.quantifier
-                div#adjective.span3= entry.adjective
-                div#noun.span3= entry.noun
-                div#comment.span3= entry.comment
-        div.span3
-            div.row                
-                div.span1
-                    a(id=entry.id).searchEntry
-                        img(src="/images/glyphicons/png/glyphicons_027_search.png")                                
-                div.span1
-                    a(id=entry.id).editEntry
-                        img(src="/images/glyphicons/png/glyphicons_151_edit.png")        
-                div.span1
-                    a(id=entry.id).placeEntry
-                        img(src="/images/glyphicons/png/glyphicons_190_circle_plus.png")
-                div.span3
-                    div.row
-                        - if (entry.public == 1)
-                            div.span3 Is public
-                        - else
-                            div.span3 Is not public
-                        - if (entry.latitude != 0 && entry.longitude != 0)
-                            div.span3 Has location
-                        - else
-                            div.span3 No location
-                    div.row
-                        div.span3 Created\: 
-                            = entry.createdAt
-                        div.span3 Updated\: 
-                            = entry.updatedAt    
-    hr
+div#entriesPagination
+- if (undefined != entries)
+    each entry in entries
+        div.row
+            div.span3
+                div(id="entry_row_" + entry.id).row
+                    div#verb.span3= entry.verb
+                    div#quantifier.span3= entry.quantifier
+                    div#adjective.span3= entry.adjective
+                    div#noun.span3= entry.noun
+                    div#comment.span3= entry.comment
+            div.span3
+                div.row                
+                    div.span1
+                        a(id=entry.id).searchEntry
+                            img(src="/images/glyphicons/png/glyphicons_027_search.png")                                
+                    div.span1
+                        a(id=entry.id).editEntry
+                            img(src="/images/glyphicons/png/glyphicons_151_edit.png")        
+                    div.span1
+                        a(id=entry.id).placeEntry
+                            img(src="/images/glyphicons/png/glyphicons_190_circle_plus.png")
+                    div.span3
+                        div.row
+                            - if (entry.public == 1)
+                                div.span3 Is public
+                            - else
+                                div.span3 Is not public
+                            - if (entry.latitude != 0 && entry.longitude != 0)
+                                div.span3 Has location
+                            - else
+                                div.span3 No location
+                        div.row
+                            div.span3 Created\: 
+                                = entry.createdAt
+                            div.span3 Updated\: 
+                                = entry.updatedAt    
+        hr

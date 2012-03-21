@@ -7,65 +7,155 @@
 
 var util = require('util')
   , express = require('express')
-  , routes = require('./routes')
-  , passport = require('passport')
+  , routes = require('./routes')  
   , model = require('./model.js')
   , moment = require('moment')
-  , FacebookStrategy = require('passport-facebook').Strategy;
+  , everyauth = require('everyauth')
+  //, passport = require('passport')
+  //, FacebookStrategy = require('passport-facebook').Strategy
+  //, GoogleStrategy = require('passport-google').Strategy
 
-passport.use(new FacebookStrategy({
-    clientID: '380922881926658',
-    clientSecret: '3b3303e818306a9656fa2ccea7b7d0f5',
-    callbackURL: "http://localhost:1581/auth/facebook/callback"
+everyauth.debug = true;
+  
+var connect = require('connect')
+
+everyauth.twitter
+    .consumerKey('cVdVyEXIjetxWqTjcVcdWg')
+    .consumerSecret('169LM6w2KHyU1PLlLHVSj2Bhdb2BnMiEEoy7a4hv9M8')
+    .findOrCreateUser(function(session, accessToken, accessTokenSecret, twitterUserMetadata) {
+        var provider = 'twitter';
+        console.log('before db call');
+            // Example 2 - Async Example
+    // var promise = this.Promise()
+    // YourUserModel.find({ login: login}, function (err, user) {
+    //   if (err) return promise.fulfill([err]);
+    //   promise.fulfill(user);
+    // }
+    // return promise;
+        var promise = this.Promise();
+        
+        db.dbFindOrCreateUser(provider, twitterUserMetadata, function(err, user) {
+            if (err) return promise.fulfill([err]);
+            promise.fulfill(user);
+        })
+        return promise;
+    })
+    .redirectPath('/');
+
+/*everyauth.password
+    .getLoginPath('/login')
+    .postLoginPath('/login')
+    .loginView('login')
+    .authenticate( function (login, password) {
+        //var promise = this.Promise();
+        var user = {};
+        user.id = 1;
+        //promise.fulfill(user);
+        //return promise;
+        return user;
+    })
+    .loginSuccessRedirect('/')
+    .getRegisterPath('/register')
+    .postRegisterPath('/register')
+    .registerView('register')
+    .validateRegistration(function(newUserAttributes) {
+    
+    })
+    .registerUser(function( newUserAttributes ) {
+    
+    })
+    .registerSuccessRedirect('/')
+*/
+everyauth.everymodule.findUserById( function(userId, callback) {
+    var user = {};
+    user.id = userId;
+    //console.log('this user is: ' + userId);
+    return callback(null, user);
+});    
+
+// everyauth.facebook
+    // .appId('380922881926658')
+    // .appSecret('3b3303e818306a9656fa2ccea7b7d0f5')
+    // .handleAuthCallbackError(function(req,res) {
+        // console.log('in handleAuthCallback Error');
+    // })
+    // .findOrCreateUser( function (session, accessToken, accessTokExtra, fbUserMetadata) {
+        // console.log(fbUserMetadata);
+        // //Verifies if user in database already
+        // try{
+            // var id = fbUserMetadata.id;
+            // var promise = this.Promise();
+            // /*User.findOne({ fbid: id}, function(err, result) {
+                // var user;
+                // if(!result) {
+                    // user = new User();
+                    // user.fbid = id;
+                    // user.firstName = fbUserMetadata.first_name;
+                    // user.lastName = fbUserMetadata.last_name;
+                    // user.save();
+                // } else {
+                    // user = result;
+                // }
+                // promise.fulfill(user);
+            // });*/
+            // var user = {};
+            // user.id = fbUserMetadata.id;
+            // user.firstName = fbUserMetadata.first_name;
+            // user.lastName = fbUserMetadata.last_name;
+            // promise.fulfill(user);
+            // return promise;
+        // }
+        // catch(err){
+        // console.log(err);
+        // }
+    // })
+    // .redirectPath('/')
+    // //.entryPath('/auth/facebook')
+    // //.callbackPath('/auth/facebook/callback')
+    // //.scope('email')
+    // //.fields('id,name,email');
+  
+
+/*passport.use(new GoogleStrategy({
+    returnURL: 'http://localhost:1581/auth/google/return',
+    realm: 'http://localhost:1581/'
     },
-    function(accessToken, refreshToken, profile, done) {
-        console.log({ facebookId: profile.id });
-        User.findOrCreate({ facebookId: profile.id }, function (err, user) {
-        if (err) { return done(err); }
-            done(null, user);
-        });
+    function(identifier, profile, done) {
+        console.log('got back:');
+        console.log(identifier);
+        console.log(profile);
+        console.log('finding user.');
+        user = {id: 2};
+        //findOrCreate({ openId: identifier }, function (err, user) {
+        return done(null, user);
+        //});
     }
 ));
 
+function findOrCreate(identifier, err, next) {
+    console.log('here');
+    next(err, identifier);
+}
+*/  
 var db = new model();
 
 var defaultEntriesPageLength = 10;
-
-function findById(id, fn) {
-  var idx = id - 1;
-  if (users[idx]) {
-    fn(null, users[idx]);
-  } else {
-    fn(new Error('User ' + id + ' does not exist'));
-  }
-}
-
-function findByUsername(username, fn) {
-  for (var i = 0, len = users.length; i < len; i++) {
-    var user = users[i];
-    if (user.username === username) {
-      return fn(null, user);
-    }
-  }
-  return fn(null, null);
-}
-
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
 //   serialize users into and deserialize users out of the session.  Typically,
 //   this will be as simple as storing the user ID when serializing, and finding
 //   the user by ID when deserializing.
-passport.serializeUser(function(user, done) {
+/*passport.serializeUser(function(user, done) {
   done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-  findById(id, function (err, user) {
-    done(err, user);
-  });
+  //findById(id, function (err, user) {
+    done(null, user);
+  //});
 });
-
+*/
 
 // Use the LocalStrategy within Passport.
 //   Strategies in passport require a `verify` function, which accept
@@ -103,11 +193,9 @@ app.configure(function(){
   app.use(express.session({secret: "FtHCfm1r4f"}));
   app.use(express.methodOverride());
   app.use(require('stylus').middleware({ src: __dirname + '/public' }));
-  // Initialize Passport!  Also use passport.session() middleware, to support
-  // persistent login sessions (recommended).
-  app.use(passport.initialize());
-  app.use(passport.session());
-  app.use(app.router);
+  app.use(everyauth.middleware())
+  app.use(app.router)
+
   app.use(express.static(__dirname + '/public'));
 });
 
@@ -122,28 +210,12 @@ app.configure('production', function(){
 // Routes
 
 //app.get('/', routes.index);
-app.get('/', function(req, res) {
-    if (req.user) {
-        res.render('user', {user: req.user});
-    }
-    else {
-        res.render('index');
-    }
+app.get('/', ensureAuthenticated, function(req, res) {
+    console.log('here');
+    console.log(req.user);
+    console.log('there');
+    res.render('user');
 })
-
-app.get('/auth/facebook',
-  passport.authenticate('facebook'),
-  function(req, res){
-    // The request will be redirected to Facebook for authentication, so
-    // this function will not be called.
-  });
-
-app.get('/auth/facebook/callback', 
-  passport.authenticate('facebook', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('/');
-  });
 
 app.get('/account', ensureAuthenticated, function(req, res){
   res.render('account', { user: req.user });
@@ -152,8 +224,21 @@ app.get('/account', ensureAuthenticated, function(req, res){
 app.get('/login', function(req, res){
   res.render('login', { user: req.user });
 });
+/*
+// Redirect the user to Google for authentication.  When complete, Google
+// will redirect the user back to the application at
+// /auth/google/return
+app.get('/auth/google', passport.authenticate('google'));
 
-
+// Google will redirect the user to this URL after authentication.  Finish
+// the process by verifying the assertion.  If valid, the user will be
+// logged in.  Otherwise, authentication has failed.
+app.get('/auth/google/return', 
+  passport.authenticate('google', { successRedirect: '/',
+                                    successFlash: 'Welcome',
+                                    failureRedirect: '/login',
+                                    failureFlash: true}));
+*/
 /*app.get( '/entries/user/:id', function( req, res ) {
     var today = new Date();
     u = req.params.id;
@@ -219,8 +304,7 @@ app.get( '/entries/user/:id/:date', function( req, res ) {
 });
  
 // and for post data...
-app.post('/update', ensureAuthenticated, function( req, res ) {
-    console.log(req.user.id);
+app.post('/update', ensureAuthenticated, function( req, res ) {    
     if (req.body.verb) {
         var query = db.Person.find(parseInt(req.user.id));
         query.on('success', function(result) {
@@ -246,17 +330,15 @@ app.post('/update', ensureAuthenticated, function( req, res ) {
     }
 });
 
+everyauth.helpExpress(app);
+
 var port = process.env.PORT || 1581;
 app.listen(port);
 console.log("Express server listening on port %d in %s mode", port, app.settings.env);
 
-
-// Simple route middleware to ensure user is authenticated.
-//   Use this route middleware on any resource that needs to be protected.  If
-//   the request is authenticated (typically via a persistent login session),
-//   the request will proceed.  Otherwise, the user will be redirected to the
-//   login page.
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
-}
+function ensureAuthenticated (req, res, next) {
+  if (!req.loggedIn) { /* `req.loggedIn` is a boolean that comes with `everyauth` */
+    return res.redirect('/login');
+  }
+  next(); // Otherwise, pass control to your route handler
+};
