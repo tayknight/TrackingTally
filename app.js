@@ -15,7 +15,7 @@ var util = require('util')
   //, FacebookStrategy = require('passport-facebook').Strategy
   //, GoogleStrategy = require('passport-google').Strategy
 
-everyauth.debug = true;
+//everyauth.debug = true;
   
 var connect = require('connect')
 
@@ -24,14 +24,6 @@ everyauth.twitter
     .consumerSecret('169LM6w2KHyU1PLlLHVSj2Bhdb2BnMiEEoy7a4hv9M8')
     .findOrCreateUser(function(session, accessToken, accessTokenSecret, twitterUserMetadata) {
         var provider = 'twitter';
-        console.log('before db call');
-            // Example 2 - Async Example
-    // var promise = this.Promise()
-    // YourUserModel.find({ login: login}, function (err, user) {
-    //   if (err) return promise.fulfill([err]);
-    //   promise.fulfill(user);
-    // }
-    // return promise;
         var promise = this.Promise();
         
         db.dbFindOrCreateUser(provider, twitterUserMetadata, function(err, user) {
@@ -67,10 +59,7 @@ everyauth.twitter
     .registerSuccessRedirect('/')
 */
 everyauth.everymodule.findUserById( function(userId, callback) {
-    var user = {};
-    user.id = userId;
-    //console.log('this user is: ' + userId);
-    return callback(null, user);
+    db.dbFindUser(userId, callback);
 });    
 
 // everyauth.facebook
@@ -93,7 +82,7 @@ everyauth.everymodule.findUserById( function(userId, callback) {
                     // user.firstName = fbUserMetadata.first_name;
                     // user.lastName = fbUserMetadata.last_name;
                     // user.save();
-                // } else {
+                // } else 
                     // user = result;
                 // }
                 // promise.fulfill(user);
@@ -193,10 +182,9 @@ app.configure(function(){
   app.use(express.session({secret: "FtHCfm1r4f"}));
   app.use(express.methodOverride());
   app.use(require('stylus').middleware({ src: __dirname + '/public' }));
+  app.use(express.static(__dirname + '/public'));
   app.use(everyauth.middleware())
   app.use(app.router)
-
-  app.use(express.static(__dirname + '/public'));
 });
 
 app.configure('development', function(){
@@ -211,10 +199,7 @@ app.configure('production', function(){
 
 //app.get('/', routes.index);
 app.get('/', ensureAuthenticated, function(req, res) {
-    console.log('here');
-    console.log(req.user);
-    console.log('there');
-    res.render('user');
+    res.render('user', {user: req.user});
 })
 
 app.get('/account', ensureAuthenticated, function(req, res){

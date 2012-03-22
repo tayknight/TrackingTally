@@ -58,7 +58,19 @@ var Model = function() {
     entities.person = this.Person;
     entities.entry = this.Entry;
     
-    
+    this.dbFindUser = function(id, next) {
+        entities.person.find(id).success(function(thisPerson) {
+            if (thisPerson) {
+                next(null, thisPerson);
+            }
+            else {
+                next(null, null);
+            }
+        }).failure(function(err) {
+            next (err, null);
+        });
+        
+    }
     
     this.dbFindOrCreateUser = function(provider, twitterMetadata, next) {
         entities.person.find({where: {provider: provider, identifier: twitterMetadata.id}}).success(function(thisPerson) {
@@ -137,8 +149,8 @@ var Model = function() {
             ).success(function(theseEntries) {
                 if (theseEntries) {
                     for (var i = 0; i < theseEntries.length; i++) {
-                        theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('MMM DD, YYYY hh:mm a');
-                        theseEntries[i].updatedAt = moment(new Date(theseEntries[i].updatedAt)).format('MMM DD, YYYY hh:mm a');
+                        theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('MM/DD/YYYY hh:mm a');
+                        theseEntries[i].updatedAt = moment(new Date(theseEntries[i].updatedAt)).format('MM/DD/YYYY hh:mm a');
                     }
                     util.puts('found');            
                     next(theseEntries);

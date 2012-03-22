@@ -1,44 +1,49 @@
-div.container
-    div.row
-        div.span12
-            h2.center TrackingTally 
-    div.row
-        // leave empty
-    div.row
+div.navbar.navbar-fixed-top
+    div.navbar-inner
+        div.container-fluid
+            a.btn.btn-navbar(data-toggle='collapse', data-target='.nav-collapse')
+                span.icon-bar
+                span.icon-bar
+                span.icon-bar
+            a.brand(href='/') willcount
+            
+div.container-fluid
+    div.row-fluid
         div.span6
             form(id='entryForm', action='/', method='post')
                 input(type='hidden', id='user_id', value=everyauth.user.id)
                 div#entryForm
-                    div.data.row
-                        div.span6
-                            input(type="text", placeholder="Verb", id="entryverb").span6
-                    div.data.row
-                        div.span6
-                            input(type="text", placeholder="Quantifier", id="entryquantifier").span6
-                    div.data.row
-                        div.span6
-                            input(type="text", placeholder="Adjective", id="entryadjective").span6
-                    div.data.row
-                        div.span6
-                            input(type="text", placeholder="Noun", id="entrynoun").span6
-                    div.data.row
-                        div.span6
-                            input(type="text", placeholder="Comment", id="entrycomment").span6
-                    //div.data.row
+                    div.data.row-fluid
+                        div.span12
+                            input(type="text", placeholder="Verb", id="entryverb").span12
+                    div.data.row-fluid
+                        div.span12
+                            input(type="text", placeholder="Quantifier", id="entryquantifier").span12
+                    div.data.row-fluid
+                        div.span12
+                            input(type="text", placeholder="Adjective", id="entryadjective").span12
+                    div.data.row-fluid
+                        div.span12
+                            input(type="text", placeholder="Noun", id="entrynoun").span12
+                    div.data.row-fluid
+                        div.span12
+                            input(type="text", placeholder="Comment", id="entrycomment").span12
+                    //div.data.row-fluid
                     //    div.span6
                     //        h3#position.explanation
                             input(type="hidden", id="entrylatitude")
                             input(type="hidden", id="entrylongitude")                            
-                    //div.data.row
+                    //div.data.row-fluid
                     //    div.span6
                     //        h3.explanation Public
-                    div.data.row
-                        div.span6
+                    div.data.row-fluid
+                        div.span12
                             input(type='button', id='cancelButton', class='btn btn-primary btn-large', value="Cancel")
-                            input(type='submit', class='btn btn-primary btn-large').pull-right
-                                
+                            input(type='submit', class='btn btn-primary btn-large').pull-right           
         div#entriesDisplay.span6.entries
           p Please wait. Loading...
+hr
+
 script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js')
 script(src='/bootstrap/js/bootstrap-collapse.js')
 script(src='/javascript/location.js')

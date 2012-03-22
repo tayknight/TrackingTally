@@ -1,66 +1,46 @@
-span.hidden#today= today
-span.hidden#requested= requested
-span.hidden#entriesCount= entriesCount
-
+//span.invisible#today= today
+//span.invisible#requested= requested
+// http://www.strangerstudios.com/sandbox/pagination/diggstyle_function.txt
 totalPages = Math.ceil(parseInt(entriesCount) / parseInt(defaultEntriesPageLength))
 requested = parseInt(requested)
 entriesCount = parseInt(entriesCount)
 
-span.hidden#totalPages= totalPages
-
-
-    div.navbar
-        div.navbar-inner
-            div.container
-                a(data-toggle='collapse', data-target='.nav-collapse').btn.btn-navbar
-                    span.icon-bar
-                    span.icon-bar
-                    span.icon-bar
-                
-                a.brand(href='#') Entries
-                div.nav-collapse
-                    ul.nav
-                        li 
-                            a(id='yesterdayLink') Previous
-                        li
-                            a(id='nextLink') Next
-
-// http://www.strangerstudios.com/sandbox/pagination/diggstyle_function.txt
-div#entriesPagination
+div#entriesPagination(data-entries-count=entriesCount, data-requested=requested, data-total-pages=totalPages)
 - if (undefined != entries)
     each entry in entries
-        div.row
-            div.span3
-                div(id="entry_row_" + entry.id).row
-                    div#verb.span3= entry.verb
-                    div#quantifier.span3= entry.quantifier
-                    div#adjective.span3= entry.adjective
-                    div#noun.span3= entry.noun
-                    div#comment.span3= entry.comment
-            div.span3
-                div.row                
-                    div.span1
-                        a(id=entry.id).searchEntry
-                            img(src="/images/glyphicons/png/glyphicons_027_search.png")                                
-                    div.span1
-                        a(id=entry.id).editEntry
-                            img(src="/images/glyphicons/png/glyphicons_151_edit.png")        
-                    div.span1
-                        a(id=entry.id).placeEntry
-                            img(src="/images/glyphicons/png/glyphicons_190_circle_plus.png")
-                    div.span3
-                        div.row
+        //hr
+        div.row-fluid.entry_cell
+            div.span6.entry_data
+                table.table
+                    tr
+                        td.oneFifths
                             - if (entry.public == 1)
-                                div.span3 Is public
+                                img(src='/images/glyphicons/png/glyphicons_051_eye_open.png')
                             - else
-                                div.span3 Is not public
+                                img(src='/images/glyphicons/png/glyphicons_052_eye_close.png')
+                        td.oneFifths
                             - if (entry.latitude != 0 && entry.longitude != 0)
-                                div.span3 Has location
+                                img(src='/images/glyphicons/png/glyphicons_242_google_maps.png')
                             - else
-                                div.span3 No location
-                        div.row
-                            div.span3 Created\: 
-                                = entry.createdAt
-                            div.span3 Updated\: 
-                                = entry.updatedAt    
-        hr
+                                img(src='/images/glyphicons/png/custom_001_no_google_maps.png')
+                        td.oneFifths
+                            a(id=entry.id).searchEntry
+                                img(src="/images/glyphicons/png/glyphicons_027_search.png")                                
+                        td.oneFifths
+                            a(id=entry.id).editEntry
+                                img(src="/images/glyphicons/png/glyphicons_151_edit.png") 
+                        td.oneFifths
+                            a(id=entry.id).placeEntry
+                                img(src="/images/glyphicons/png/glyphicons_190_circle_plus.png")
+                div(id="entry_row_" + entry.id)
+                    div.row-fluid
+                        div.span12
+                            p.entry= entry.verb + ' ' + entry.quantifier + ' ' + entry.adjective + ' ' + entry.noun + '.'
+                    - if (entry.comment)
+                        div.row-fluid
+                            = entry.comment                    
+            div.span6.entry_metadata
+                table.table
+                    tr
+                        td(colspan=5).created= entry.createdAt
+                

@@ -7,7 +7,7 @@ var getUsersEntries =  function(pageNum) {
         , success: function(data) {
                     $("#entriesDisplay").html(data);
                     initializeEntryClickHandler();
-                    makePagination(pageNum, parseInt($('#entriesCount').text()));
+                    makePagination(pageNum, parseInt($('#entriesPagination').data('entries-count')));
                     }
     });
 }
@@ -96,8 +96,11 @@ var makePagination = function(requested, total_entries) {
     //$('#entriesPagination').append("<div class='pagination'><ul>");
     var parent_ul = $("<ul></ul>");
 
-    if (total_pages > 1) {        
-        if (total_pages <= 7) { // dont' bother paginating
+    if (total_pages <= 1) {
+        parent_ul.append('<li class="disabled"><a href="#">1</a></li>');
+    }    
+    else if (total_pages > 1) {        
+        if (total_pages < 6) { // dont' bother paginating
             for (var counter = 1; counter <= total_pages; counter++) {
                 if (counter == requested) {
                     parent_ul.append('<li class="active"><a href="#">' + counter + '</a></li>');
@@ -107,8 +110,8 @@ var makePagination = function(requested, total_entries) {
                 }
             }
         }   
-        else if (total_pages >= 7) {
-            // close the middle. only hide later pages.
+        else if (total_pages >= 6) {
+            // beginning. only hide later pages.
             if (requested < 5) {
                 for (var counter = 1; counter <= 5; counter++) {
                     if (counter == requested) {
@@ -140,7 +143,7 @@ var makePagination = function(requested, total_entries) {
             else {
                 parent_ul.append('<li><a href="#">1</a></li>');
                 parent_ul.append('<li class="disabled"><a href="#">...</a></li>');
-                for (var counter = total_pages - 3; counter <= total_pages; counter++) {
+                for (var counter = total_pages - 4; counter <= total_pages; counter++) {
                     if (counter == requested) {
                         parent_ul.append('<li class="active"><a href="#">' + counter + '</a></li>');
                     }

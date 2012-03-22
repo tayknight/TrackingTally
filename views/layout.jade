@@ -8,8 +8,14 @@ html
     meta(name="author", content="")
     title= "TrackingTally"
     link(rel='stylesheet', href='/bootstrap/css/bootstrap.min.css')
+    style
+        body {
+            padding-top: 60px;
+            padding-bottom: 60px;
+            max-width: 940px;
+        }
     link(rel='stylesheet', href='/bootstrap/css/bootstrap-responsive.min.css')
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/style.css')    
   body!= body
     script
         window.addEventListener("load",function() {

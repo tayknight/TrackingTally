@@ -1,5 +1,12 @@
+html {
+  Helvetica: Neue, Calibri, sans-serif;
+}
+body {
+  background-color: rgba(0,0,0,0.05);
+}
 .container-fluid {
-  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 .container {
   padding-left: 5px;
@@ -44,11 +51,19 @@ hr.tight {
 input[type=text] {
   font-size: 18px;
 }
-.entry {
-  background: #bdbb9b;
-  margin-top: 3px;
-  margin-bottom: 3px;
-  padding: 0 5px;
+.pagination {
+  margin-top: 0px;
+}
+.entry_cell {
+  background: #fff;
+  margin-bottom: 1em;
+  padding: 5px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.20);
+  -moz-box-shadow: 0 0 5px rgba(0,0,0,0.20);
+  box-shadow: 0 0 5px rgba(0,0,0,0.20);
 }
 .image {
   float: right;
@@ -81,4 +96,25 @@ input[type=text] {
 .halfWidth {
   float: left;
   width: 50%;
+}
+.entry_data,
+.entry_metadata,
+#entriesDisplay hr {
+  margin: 0px;
+}
+.entry_data table {
+  max-width: 215px;
+  margin-bottom: 0px;
+}
+.entry_metadata table {
+  max-width: 215px;
+  margin-bottom: 0px;
+}
+.entry_data table td {
+  padding: 10px 0 0 0;
+  border-top: 0px;
+}
+.entry_metadata table td {
+  padding: 10px 0 0 0;
+  border-top: 0px;
 }
