@@ -12,40 +12,18 @@ var getUsersEntries =  function(pageNum) {
     });
 }
 
-var placeExistingEntry = function(thisId) {
-    verb = $('#entry_row_' + thisId).children('div #verb').text();
-    quantifier = $('#entry_row_' + thisId).children('div #quantifier').text();
-    adjective = $('#entry_row_' + thisId).children('div #adjective').text();
-    noun = $('#entry_row_' + thisId).children('div #noun').text();
-    comment = $('#entry_row_' + thisId).children('div #comment').text();
-    
-    $('#entryverb').val(verb);
-    $('#entryquantifier').val(quantifier);
-    $('#entryadjective').val(adjective);
-    $('#entrynoun').val(noun);
-    $('#entrycomment').val(comment);
+var placeExistingEntry = function(thisData) {
+    $('#entryverb').val(thisData.verb);
+    $('#entryquantifier').val(thisData.quantifier);
+    $('#entryadjective').val(thisData.adjective);
+    $('#entrynoun').val(thisData.noun);
+    $('#entrycomment').val(thisData.comment);
     
     $('#entryverb').focus();
 };
 
-var initializeOlderClickHandler = function() {
-    $('#olderButton').click(function() {    
-        var t = $('#today').html();
-        fetchDate = moment(new Date(t)).add('d', -1).format('YYYY-MM-DD');
-        getUsersEntries(fetchDate);
-    });
-};
-
-var initializeNewerClickHandler = function() {
-    $('#newerButton').click(function() {    
-        var t = $('#today').html();
-        fetchDate = moment(new Date(t)).add('d', 1).format('YYYY-MM-DD');
-        getUsersEntries(fetchDate);
-    });
-};
-
 var initializeEntryClickHandler = function() {
-    $('.placeEntry').click(function() { placeExistingEntry($(this).attr('id')) })
+    $('.placeEntry').click(function() { placeExistingEntry($(this).data()) })
 }
 
 var initializeSaveHandler = function() {

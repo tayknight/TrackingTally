@@ -1,46 +1,37 @@
-//span.invisible#today= today
-//span.invisible#requested= requested
-// http://www.strangerstudios.com/sandbox/pagination/diggstyle_function.txt
 totalPages = Math.ceil(parseInt(entriesCount) / parseInt(defaultEntriesPageLength))
 requested = parseInt(requested)
 entriesCount = parseInt(entriesCount)
 
 div#entriesPagination(data-entries-count=entriesCount, data-requested=requested, data-total-pages=totalPages)
+
 - if (undefined != entries)
-    each entry in entries
-        //hr
-        div.row-fluid.entry_cell
-            div.span6.entry_data
-                table.table
-                    tr
-                        td.oneFifths
-                            - if (entry.public == 1)
-                                img(src='/images/glyphicons/png/glyphicons_051_eye_open.png')
-                            - else
-                                img(src='/images/glyphicons/png/glyphicons_052_eye_close.png')
-                        td.oneFifths
-                            - if (entry.latitude != 0 && entry.longitude != 0)
-                                img(src='/images/glyphicons/png/glyphicons_242_google_maps.png')
-                            - else
-                                img(src='/images/glyphicons/png/custom_001_no_google_maps.png')
-                        td.oneFifths
-                            a(id=entry.id).searchEntry
-                                img(src="/images/glyphicons/png/glyphicons_027_search.png")                                
-                        td.oneFifths
-                            a(id=entry.id).editEntry
-                                img(src="/images/glyphicons/png/glyphicons_151_edit.png") 
-                        td.oneFifths
-                            a(id=entry.id).placeEntry
-                                img(src="/images/glyphicons/png/glyphicons_190_circle_plus.png")
-                div(id="entry_row_" + entry.id)
-                    div.row-fluid
-                        div.span12
-                            p.entry= entry.verb + ' ' + entry.quantifier + ' ' + entry.adjective + ' ' + entry.noun + '.'
+    ul.unstyled.entrylist.well
+        each entry in entries
+            li
+                p.entry= entry.verb + ' ' + entry.quantifier + ' ' + entry.adjective + ' ' + entry.noun + '.'
                     - if (entry.comment)
-                        div.row-fluid
-                            = entry.comment                    
-            div.span6.entry_metadata
-                table.table
-                    tr
-                        td(colspan=5).created= entry.createdAt
-                
+                        br
+                        =entry.comment
+            li.meta
+                div.row-fluid.entrymeta
+                    div.span12.btn-group
+                        a.btn.disabled
+                            = entry.createdAt
+                        - if (entry.public == 1)
+                            a.btn.disabled
+                                i.icon-eye-open
+                        - else
+                            a.btn.disabled
+                                i.icon-eye-close
+                        - if (entry.latitude != 0 && entry.longitude != 0)
+                            a.btn.disabled
+                                i.icon-map-marker
+                        - else
+                            a.btn.disabled
+                                i.icon-ban-circle
+                        a.btn
+                            i.icon-search
+                        a.btn
+                            i.icon-edit
+                        a(id=entry.id, data-verb=entry.verb, data-quantifier=entry.quantifier, data-adjective=entry.adjective, data-noun=entry.noun, data-comment=entry.comment).btn.placeEntry
+                            i.icon-plus

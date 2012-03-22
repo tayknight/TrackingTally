@@ -149,7 +149,7 @@ var Model = function() {
             ).success(function(theseEntries) {
                 if (theseEntries) {
                     for (var i = 0; i < theseEntries.length; i++) {
-                        theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('MM/DD/YYYY hh:mm a');
+                        theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('hh:mm A. MMMM DD, YYYY');
                         theseEntries[i].updatedAt = moment(new Date(theseEntries[i].updatedAt)).format('MM/DD/YYYY hh:mm a');
                     }
                     util.puts('found');            

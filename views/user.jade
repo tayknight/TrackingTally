@@ -10,9 +10,11 @@ div.navbar.navbar-fixed-top
 div.container-fluid
     div.row-fluid
         div.span6
-            form(id='entryForm', action='/', method='post')
+            form(id='entryForm', action='/', method='post').well
+                fieldset
+                    legend What did you do?
                 input(type='hidden', id='user_id', value=everyauth.user.id)
-                div#entryForm
+                div#entryForm.control-group
                     div.data.row-fluid
                         div.span12
                             input(type="text", placeholder="Verb", id="entryverb").span12
@@ -31,13 +33,14 @@ div.container-fluid
                     //div.data.row-fluid
                     //    div.span6
                     //        h3#position.explanation
-                            input(type="hidden", id="entrylatitude")
-                            input(type="hidden", id="entrylongitude")                            
+                            
                     //div.data.row-fluid
                     //    div.span6
                     //        h3.explanation Public
                     div.data.row-fluid
                         div.span12
+                            input(type="hidden", id="entrylatitude")
+                            input(type="hidden", id="entrylongitude")
                             input(type='button', id='cancelButton', class='btn btn-primary btn-large', value="Cancel")
                             input(type='submit', class='btn btn-primary btn-large').pull-right           
         div#entriesDisplay.span6.entries
