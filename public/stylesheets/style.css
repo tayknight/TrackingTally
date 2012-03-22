@@ -69,7 +69,8 @@ input[type=text] {
   display: inline;
 }
 .placeEntry,
-.moveDate {
+.moveDate,
+.pagination ul li a {
   cursor: pointer;
 }
 .entrySave {

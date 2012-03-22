@@ -15,8 +15,12 @@ div#entriesPagination(data-entries-count=entriesCount, data-requested=requested,
             li.meta
                 div.row-fluid.entrymeta
                     div.span12.btn-group
-                        a.btn.disabled
-                            = entry.createdAt
+                        a(id=entry.id, data-verb=entry.verb, data-quantifier=entry.quantifier, data-adjective=entry.adjective, data-noun=entry.noun, data-comment=entry.comment).btn.placeEntry
+                            i.icon-plus
+                        a.btn
+                            i.icon-search
+                        a.btn
+                            i.icon-edit                        
                         - if (entry.public == 1)
                             a.btn.disabled
                                 i.icon-eye-open
@@ -29,9 +33,5 @@ div#entriesPagination(data-entries-count=entriesCount, data-requested=requested,
                         - else
                             a.btn.disabled
                                 i.icon-ban-circle
-                        a.btn
-                            i.icon-search
-                        a.btn
-                            i.icon-edit
-                        a(id=entry.id, data-verb=entry.verb, data-quantifier=entry.quantifier, data-adjective=entry.adjective, data-noun=entry.noun, data-comment=entry.comment).btn.placeEntry
-                            i.icon-plus
+                        a.btn.disabled
+                            = entry.createdAt

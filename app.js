@@ -323,7 +323,7 @@ console.log("Express server listening on port %d in %s mode", port, app.settings
 
 function ensureAuthenticated (req, res, next) {
   if (!req.loggedIn) { /* `req.loggedIn` is a boolean that comes with `everyauth` */
-    return res.redirect('/auth/twitter');
+    return res.redirect('/login');
   }
   next(); // Otherwise, pass control to your route handler
 };

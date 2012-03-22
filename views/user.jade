@@ -6,6 +6,13 @@ div.navbar.navbar-fixed-top
                 span.icon-bar
                 span.icon-bar
             a.brand(href='/') willcount
+            div.nav-collapse
+                ul.nav
+                    li
+                        a(href="#").user
+                            #{everyauth.user.username}
+                    li
+                        a(href='/logout') logout                
             
 div.container-fluid
     div.row-fluid

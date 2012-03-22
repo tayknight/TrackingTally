@@ -81,10 +81,10 @@ var makePagination = function(requested, total_entries) {
         if (total_pages < 6) { // dont' bother paginating
             for (var counter = 1; counter <= total_pages; counter++) {
                 if (counter == requested) {
-                    parent_ul.append('<li class="active"><a href="#">' + counter + '</a></li>');
+                    parent_ul.append('<li class="active"><a>' + counter + '</a></li>');
                 }
                 else {
-                    parent_ul.append('<li><a href="#">' + counter + '</a></li>');
+                    parent_ul.append('<li><a>' + counter + '</a></li>');
                 }
             }
         }   
@@ -93,40 +93,40 @@ var makePagination = function(requested, total_entries) {
             if (requested < 5) {
                 for (var counter = 1; counter <= 5; counter++) {
                     if (counter == requested) {
-                        parent_ul.append('<li class="active"><a href="#">' + counter + '</a></li>');
+                        parent_ul.append('<li class="active"><a>' + counter + '</a></li>');
                     }
                     else {
-                        parent_ul.append('<li><a href="#">' + counter + '</a></li>');
+                        parent_ul.append('<li><a>' + counter + '</a></li>');
                     }
                 }
-                parent_ul.append('<li class="disabled"><a href="#">...</a></li>');
+                parent_ul.append('<li class="disabled"><a>...</a></li>');
                 parent_ul.append('<li><a href="#">' + total_pages + '</a></li>');
             }
             // in middle; hide some front and back
             else if ( total_pages - 3 > requested) {
                 parent_ul.append('<li><a href="#">1</a></li>');
-                parent_ul.append('<li class="disabled"><a href="#">...</a></li>');
+                parent_ul.append('<li class="disabled"><a>...</a></li>');
                 for (var counter = requested-1; counter < (requested + 2); counter++) {
                     if (counter == requested) {
-                        parent_ul.append('<li class="active"><a href="#">' + counter + '</a></li>');
+                        parent_ul.append('<li class="active"><a>' + counter + '</a></li>');
                     }
                     else {
-                        parent_ul.append('<li><a href="#">' + counter + '</a></li>');
+                        parent_ul.append('<li><a>' + counter + '</a></li>');
                     }
                 }
-                parent_ul.append('<li class="disabled"><a href="#">...</a></li>');
+                parent_ul.append('<li class="disabled"><a>...</a></li>');
                 parent_ul.append('<li><a href="#">' + total_pages + '</a></li>');
             }
             // close to the end; only hide early pages
             else {
                 parent_ul.append('<li><a href="#">1</a></li>');
-                parent_ul.append('<li class="disabled"><a href="#">...</a></li>');
+                parent_ul.append('<li class="disabled"><a>...</a></li>');
                 for (var counter = total_pages - 4; counter <= total_pages; counter++) {
                     if (counter == requested) {
-                        parent_ul.append('<li class="active"><a href="#">' + counter + '</a></li>');
+                        parent_ul.append('<li class="active"><a>' + counter + '</a></li>');
                     }
                     else {
-                        parent_ul.append('<li><a href="#">' + counter + '</a></li>');
+                        parent_ul.append('<li><a>' + counter + '</a></li>');
                     }
                 }
             }
@@ -140,7 +140,7 @@ var makePagination = function(requested, total_entries) {
                     parent_ul.append('<li class="counter"><a href="#">' + counter + '</a></li>');
                 }   
                 else {
-                    parent_ul.append('<li><a href="#">' + counter + '</a></li>');
+                    parent_ul.append('<li><a>' + counter + '</a></li>');
                 }
             }
             if (requested < total_pages - 1){
