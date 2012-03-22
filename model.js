@@ -153,7 +153,7 @@ var Model = function() {
                         theseEntries[i].updatedAt = moment(new Date(theseEntries[i].updatedAt)).format('MM/DD/YYYY hh:mm a');
                     }
                     util.puts('found');            
-                    next(theseEntries);
+                    next(theseEntries); 
                 }
                 else {
                  theseEntries = [];
@@ -164,6 +164,38 @@ var Model = function() {
                 util.puts('error: ' + error);
                 next();
                 })
+        });
+    }
+    
+    this.dbSearchEntries = function(userId, verb, quantifier, adjective, noun, comment, page, pageLength, next) {
+        
+        entities.person.find(parseInt(userId)).success(function(thisPerson) {
+            whereClause = ['person_id=? AND verb LIKE ? AND quantifier LIKE ? AND adjective LIKE ? AND noun LIKE ? AND comment LIKE ?'
+            , thisPerson.id
+            , verb
+            , quantifier
+            , adjective
+            , noun
+            , comment];
+            entities.entry.all({
+                where: whereClause
+                , offset: pageLength*(parseInt(page)-1)
+                , limit: pageLength
+                , order: 'createdAt DESC'
+            }).success(function(theseEntries) {
+                if (theseEntries) {
+                    next(theseEntries);
+                }
+                else {
+                    //console.log('none found');
+                    theseEntries = [];
+                    next(theseEntries);
+                }
+            })
+            .error(function(error, next) {
+                util.puts('error: ' + error);
+                next();
+            })
         });
     }
 }

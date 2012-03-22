@@ -197,10 +197,14 @@ app.configure('production', function(){
 
 // Routes
 
-//app.get('/', routes.index);
 app.get('/', ensureAuthenticated, function(req, res) {
-    res.render('user', {user: req.user});
+    //res.render('user', {user: req.user});
+    res.redirect('/user/' + req.user.username);
 })
+
+app.get('/user/:username', ensureAuthenticated, function(req,res) {
+    res.render('user', {user: req.user});
+});
 
 app.get('/account', ensureAuthenticated, function(req, res){
   res.render('account', { user: req.user });
@@ -208,6 +212,29 @@ app.get('/account', ensureAuthenticated, function(req, res){
 
 app.get('/login', function(req, res){
   res.render('login', { user: req.user });
+});
+
+app.get('/search', ensureAuthenticated, function(req,res) {
+    console.log(req.query.verb);
+    
+    var verb = req.query.verb || '%';
+    var quantifier = req.query.quantifier || '%';
+    var adjective = req.query.adjective || '%';
+    var noun = req.query.noun || '%';
+    var comment = req.query.comment || '%';
+    
+    db.dbSearchEntries(req.user.id, verb, quantifier, adjective, noun, comment, 1, 10, function(theseEntries) {
+            res.render('entries', {layout: false
+                  , entriesCount: 1
+                  , entries: theseEntries
+                  , requested: p
+                  , defaultEntriesPageLength: defaultEntriesPageLength
+                  , requestedDisplay: null
+                  , todayDisplay: null
+                  })
+        })
+    
+    res.redirect('/user/' + req.user.username);
 });
 /*
 // Redirect the user to Google for authentication.  When complete, Google
