@@ -17,7 +17,7 @@ div.navbar.navbar-fixed-top
 div.container-fluid
     div.row-fluid
         div.span6
-            form(id='entryForm', action='/', method='post').well
+            form(id='entryForm', action='/', method='post', data-username=user.username).well
                 fieldset
                     legend What did you do?
                 input(type='hidden', id='user_id', value=everyauth.user.id)
@@ -46,10 +46,13 @@ div.container-fluid
                     //        h3.explanation Public
                     div.data.row-fluid
                         div.span12
-                            input(type="hidden", id="entrylatitude")
-                            input(type="hidden", id="entrylongitude")
-                            input(type='button', id='cancelButton', class='btn btn-primary btn-large', value="Cancel")
-                            input(type='submit', class='btn btn-primary btn-large').pull-right           
+                            div.btn-toolbar
+                                p
+                                    input(type="hidden", id="entrylatitude")
+                                    input(type="hidden", id="entrylongitude")
+                                    a.btn#cancelButton Clear
+                                    a.btn#searchButton Search
+                                    a.btn#submitButton Submit
         div#entriesDisplay.span6.entries
           p Please wait. Loading...
 hr
@@ -59,10 +62,12 @@ script(src='/bootstrap/js/bootstrap-collapse.js')
 script(src='/javascript/location.js')
 script(src='/javascript/entries.js')
 script(src='/javascript/moment.min.js')
+script(src='/javascript/jquery.query.js')
 script
     var today = new Date();
     dateFormat = 'MMM DD, YYYY';
     getUserLocation();
     getUsersEntries();
     initializeSaveHandler();
-    initilizeCancelHandler();
+    initializeCancelHandler();
+    initializeSearchHandler();

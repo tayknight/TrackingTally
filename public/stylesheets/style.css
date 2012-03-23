@@ -49,17 +49,7 @@ input[type=text] {
 }
 .pagination {
   margin-top: 0px;
-}
-.xentry_cell {
-  background: #fff;
-  margin-bottom: 1em;
-  padding: 5px;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-  -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.20);
-  -moz-box-shadow: 0 0 5px rgba(0,0,0,0.20);
-  box-shadow: 0 0 5px rgba(0,0,0,0.20);
+  margin-bottom: 1px;
 }
 .image {
   float: right;
@@ -127,6 +117,9 @@ ul.entrylist li {
 }
 ul.entrylist li.meta {
   border-bottom: 1px solid #ddd;
+}
+.entriesPager {
+  background-color: #ddd;
 }
 p.entry {
   margin: 0;

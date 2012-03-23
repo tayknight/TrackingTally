@@ -199,75 +199,55 @@ app.configure('production', function(){
 
 app.get('/', ensureAuthenticated, function(req, res) {
     //res.render('user', {user: req.user});
-    res.redirect('/user/' + req.user.username);
+    res.redirect('/' + req.user.username);
 })
 
-app.get('/user/:username', ensureAuthenticated, function(req,res) {
+app.get('/:username', ensureAuthenticated, function(req,res) {
     res.render('user', {user: req.user});
 });
 
-app.get('/account', ensureAuthenticated, function(req, res){
+app.get('/settings/account', ensureAuthenticated, function(req, res){
   res.render('account', { user: req.user });
 });
 
-app.get('/login', function(req, res){
+app.get('/users/login', function(req, res){
   res.render('login', { user: req.user });
 });
 
-app.get('/search', ensureAuthenticated, function(req,res) {
-    console.log(req.query.verb);
+app.get('/:user/entries/find/', ensureAuthenticated, function(req,res) {
+    var user = req.query['user'];
+    var u = req.user.id;
+    var p = req.query['page'] || 1;
+    var count = req.query['count'] || defaultEntriesPageLength;    
+    var verb = req.query['verb'] || '%';
+    var quantifier = req.query['quantifier'] || '%';
+    var adjective = req.query['adjective'] || '%';
+    var noun = req.query['noun'] || '%';
+    var comment = req.query['comment'] || '%';
     
+    db.dbSearchEntries(req.user.id, verb, quantifier, adjective, noun, comment, p, count, function(theseEntries) {
+            res.render('entries', {layout: false
+                  , entriesCount: 1
+                  , entries: theseEntries
+                  , requested: p
+                  , defaultEntriesPageLength: count
+                  , requestedDisplay: null
+                  , todayDisplay: null
+                  })
+        })    
+});
+
+/*app.get('/:user/entries/find/', function(req,res) {
+    util.puts('matched: /:user/entries/find');
+    var user = req.params.user;
+    var u = req.user.id;
+    var p = req.params.page || 1;
+    var count = req.params.count || defaultEntriesPageLength;
     var verb = req.query.verb || '%';
     var quantifier = req.query.quantifier || '%';
     var adjective = req.query.adjective || '%';
     var noun = req.query.noun || '%';
     var comment = req.query.comment || '%';
-    
-    db.dbSearchEntries(req.user.id, verb, quantifier, adjective, noun, comment, 1, 10, function(theseEntries) {
-            res.render('entries', {layout: false
-                  , entriesCount: 1
-                  , entries: theseEntries
-                  , requested: p
-                  , defaultEntriesPageLength: defaultEntriesPageLength
-                  , requestedDisplay: null
-                  , todayDisplay: null
-                  })
-        })
-    
-    res.redirect('/user/' + req.user.username);
-});
-/*
-// Redirect the user to Google for authentication.  When complete, Google
-// will redirect the user back to the application at
-// /auth/google/return
-app.get('/auth/google', passport.authenticate('google'));
-
-// Google will redirect the user to this URL after authentication.  Finish
-// the process by verifying the assertion.  If valid, the user will be
-// logged in.  Otherwise, authentication has failed.
-app.get('/auth/google/return', 
-  passport.authenticate('google', { successRedirect: '/',
-                                    successFlash: 'Welcome',
-                                    failureRedirect: '/login',
-                                    failureFlash: true}));
-*/
-/*app.get( '/entries/user/:id', function( req, res ) {
-    var today = new Date();
-    u = req.params.id;
-    d = req.params.date;
-    dummyDate = 'START';
-    db.dbSelectEntries(u, dummyDate, function(theseEntries) {
-        res.render('entries', {layout: false, entries: theseEntries, requested: 'All', today: today});
-    });    
-});*/
-
-
-
-app.get('/entries/user/:id/page/:page', function(req,res) {
-    var today = new Date();
-    u = req.params.id;
-    p = req.params.page;
-    util.puts('user: ' + u + '. page: ' + p);
     
     // get the user's number of entries
     db.dbGetNumberOfEntries(u, function(entriesCount) {
@@ -296,10 +276,10 @@ app.get('/entries/user/:id/page/:page', function(req,res) {
         } 
     })
 });
-
-app.get( '/entries/user/:id/:date', function( req, res ) {
+*/
+app.get( '/:user/entries/user/:id/:date', function( req, res ) {
     var today = new Date();
-    u = req.params.id;
+    u = req.user.id;
     d = req.params.date;
     var thisDate = new Date(req.params.date);
     util.puts(thisDate);
@@ -350,7 +330,7 @@ console.log("Express server listening on port %d in %s mode", port, app.settings
 
 function ensureAuthenticated (req, res, next) {
   if (!req.loggedIn) { /* `req.loggedIn` is a boolean that comes with `everyauth` */
-    return res.redirect('/login');
+    return res.redirect('/users/login');
   }
   next(); // Otherwise, pass control to your route handler
 };

@@ -149,10 +149,9 @@ var Model = function() {
             ).success(function(theseEntries) {
                 if (theseEntries) {
                     for (var i = 0; i < theseEntries.length; i++) {
-                        theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('hh:mm A. MMMM DD, YYYY');
+                        theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('hh:mm A. MM/DD/YYYY');
                         theseEntries[i].updatedAt = moment(new Date(theseEntries[i].updatedAt)).format('MM/DD/YYYY hh:mm a');
                     }
-                    util.puts('found');            
                     next(theseEntries); 
                 }
                 else {
@@ -167,8 +166,8 @@ var Model = function() {
         });
     }
     
-    this.dbSearchEntries = function(userId, verb, quantifier, adjective, noun, comment, page, pageLength, next) {
-        
+    this.dbSearchEntries = function(userId, verb, quantifier, adjective, noun, comment, page, pageLength, next) {        
+        util.puts('pageLength: ' + pageLength);
         entities.person.find(parseInt(userId)).success(function(thisPerson) {
             whereClause = ['person_id=? AND verb LIKE ? AND quantifier LIKE ? AND adjective LIKE ? AND noun LIKE ? AND comment LIKE ?'
             , thisPerson.id
@@ -184,10 +183,13 @@ var Model = function() {
                 , order: 'createdAt DESC'
             }).success(function(theseEntries) {
                 if (theseEntries) {
+                    for (var i = 0; i < theseEntries.length; i++) {
+                        theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('hh:mm A. MM/DD/YYYY');
+                        theseEntries[i].updatedAt = moment(new Date(theseEntries[i].updatedAt)).format('MM/DD/YYYY hh:mm a');
+                    }
                     next(theseEntries);
                 }
                 else {
-                    //console.log('none found');
                     theseEntries = [];
                     next(theseEntries);
                 }

@@ -1,13 +1,31 @@
-var getUsersEntries =  function(pageNum) {
+var getUsersEntries =  function(pageNum, queryString) {
     $("#entriesDisplay").html();
+    queryString = queryString || 'q=1';
+    username = $('#entryForm').data('username');
+    pageNum = pageNum || 1;
     $.ajax({
-        url: '/entries/user/' + $("#user_id").val() + '/page/' + pageNum
+        url: '/' + username + '/entries/find/?' + queryString
         , type: 'get'
         , dataType: 'html'
         , success: function(data) {
                     $("#entriesDisplay").html(data);
                     initializeEntryClickHandler();
                     makePagination(pageNum, parseInt($('#entriesPagination').data('entries-count')));
+                    window.history.replaceState(null, 'pagination change', '/' + username + '/entries/page/' + pageNum)
+                    }
+    });
+}
+
+var searchEntries = function(querystring) {
+    $.ajax({
+        url: '/search' + querystring
+        , type: 'get'
+        , dataType: 'html'
+        , success: function(data) {
+                    $("#entriesDisplay").html(data);
+                    initializeEntryClickHandler();
+                    makePagination(1, parseInt($('#entriesPagination').data('entries-count')));
+                    window.history.replaceState(null, 'search change', '/search' + querystring)
                     }
     });
 }
@@ -58,8 +76,37 @@ var initializeSaveHandler = function() {
     });    
 }
 
-var initilizeCancelHandler = function() {
+var initializeCancelHandler = function() {
     $('#cancelButton').click(function() { $('#entryForm').clearForm() });
+}
+
+var initializeSearchHandler = function() {
+    $('#searchButton').click(function() { 
+        var verb = $('#entryverb').val();
+        var quantifier = $('#entryquantifier').val();
+        var adjective = $('#entryadjective').val();
+        var noun = $('#entrynoun').val();
+        var comment = $('#entrycomment').val();
+        
+        var querystring = '?q=1';
+        if (verb.length > 0) {
+            querystring += "&verb=" + encodeURIComponent(verb);
+        }
+        if (quantifier.length > 0) {
+            querystring += "&quantifier=" + encodeURIComponent(quantifier);
+        }
+        if (adjective.length > 0) {
+            querystring += "&adjective=" + encodeURIComponent(adjective);
+        }
+        if (noun.length > 0) {
+            querystring += "&noun=" + encodeURIComponent(noun);
+        }
+        if (comment.length > 0) {
+            querystring += "&quantifier=" + encodeURIComponent(comment);
+        }
+        console.log('querystring: ' + querystring);
+        searchEntries(querystring);
+    });
 }
 
 var makePagination = function(requested, total_entries) {
@@ -155,6 +202,7 @@ var makePagination = function(requested, total_entries) {
     pagination_div.append(parent_ul);
     $('#entriesPagination').append(pagination_div);
     
+    // attach click handler to each pagination unit
     $('#entriesPagination > div.pagination > ul > li > a').click(function() { 
         getUsersEntries($(this).html());
     });
