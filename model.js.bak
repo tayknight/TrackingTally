@@ -1,7 +1,8 @@
 var util = require('util');
 var credentials = require('./credentials.js');
 var Sequelize = require("sequelize");
-var moment = require('moment')
+var moment = require('moment');
+var mysql = require('mysql');
 
 /**
    * @type {Object}
@@ -24,6 +25,66 @@ var map_attributes = function() {
 
 var Model = function() {
     console.log("Host: " + credentials.host + ". User: " + credentials.user + ". Database: " + credentials.database);
+
+    var client = mysql.createClient({
+      host: credentials.host,
+      user: credentials.user,
+      password: credentials.password,
+      port: 3306,
+      debug: false
+    });
+
+    client.query('USE '+credentials.database);
+
+    this.findUserById = function(id, next) {
+        var sql = "SELECT P.firstname \
+            , P.lastname \
+            , P.email \
+            , P.id \
+            , P.createdAt \
+            , P.updatedAt \
+            , P.provider \
+            , P.identifier \
+            , P.username \
+            FROM tt_persons P \
+            WHERE P.id = ?";
+        client.query(
+            sql
+            , [id]
+            , function (err, results, fields) {
+                if (err) {
+                    throw err;
+                }
+                console.log(results);
+                return next(results);
+            })
+    }
+
+    this.findUserByProviderUsername = function(provider, identifier, next) {
+        var sql = "SELECT P.firstname \
+            , P.lastname \
+            , P.email \
+            , P.id \
+            , P.createdAt \
+            , P.updatedAt \
+            , P.provider \
+            , P.identifier \
+            , P.username \
+            FROM tt_persons P  \
+            WHERE P.provider = ? \
+            AND P.username= ?";
+        client.query(
+            sql
+            , [provider, identifier]
+            , function (err, results, fields) {
+                if (err) {
+                    throw err;
+                }
+                console.log(results);
+                return next(results);
+            })
+    }
+
     sequelize = new Sequelize(credentials.database, credentials.user, credentials.password, {
         host: credentials.host,
         port: 3306
@@ -50,16 +111,27 @@ var Model = function() {
         comment: Sequelize.TEXT
     }
     , {instanceMethods: {mapAttributes: map_attributes}})
-    
+
     this.Person.hasMany(this.Entry)
     this.Entry.belongsTo(this.Person)
-    
+
     var entities = {};
     entities.person = this.Person;
     entities.entry = this.Entry;
-    
-    
-    
+
+    this.dbFindUser = function(id, next) {
+        entities.person.find(id).success(function(thisPerson) {
+            if (thisPerson) {
+                next(null, thisPerson);
+            }
+            else {
+                next(null, null);
+            }
+        }).failure(function(err) {
+            next (err, null);
+        });
+    }
+
     this.dbFindOrCreateUser = function(provider, twitterMetadata, next) {
         entities.person.find({where: {provider: provider, identifier: twitterMetadata.id}}).success(function(thisPerson) {
             var user = {};
@@ -73,10 +145,10 @@ var Model = function() {
                     , username: twitterMetadata.screen_name
                 });
                 newPerson.save().on('success', function(thisNewPerson) {
-                    next(null, thisNewPerson);  
+                    next(null, thisNewPerson);
                 }).on('failure', function(err) {
                     util.puts(err);
-                    next(err, null);  
+                    next(err, null);
                 })
             }
         }).error(function(err) {
@@ -84,8 +156,8 @@ var Model = function() {
             next(err, null);
         })
     }
-        
-    this.dbSelectEntries = function(userId, thisDate, next) {        
+
+    this.dbSelectEntries = function(userId, thisDate, next) {
         entities.person.find(parseInt(userId)).success(function(thisPerson) {
             if (thisDate == 'START') {
                 whereClause = ['person_id=?', thisPerson.id, thisDate, '9999-01-01']
@@ -98,7 +170,7 @@ var Model = function() {
             limit: 1000
             }
             ).success(function(theseEntries) {
-                util.puts('found');            
+                util.puts('found');
                 next(theseEntries);
                 })
              .error(function(error, next) {
@@ -107,7 +179,7 @@ var Model = function() {
                 })
         });
     }
-    
+
     this.dbGetNumberOfEntries = function(userId, next) {
         entities.person.find(parseInt(userId)).success(function(thisPerson) {
             whereClause = ['person_id=?', thisPerson.id];
@@ -115,7 +187,7 @@ var Model = function() {
               where: whereClause
             }
             ).success(function(entriesCount) {
-                util.puts('found');            
+                util.puts('found');
                 next(entriesCount);
                 })
              .error(function(error, next) {
@@ -124,8 +196,8 @@ var Model = function() {
                 })
         });
     }
-    
-    this.dbSelectEntriesPage = function(userId, page, pageLength, next) {        
+
+    this.dbSelectEntriesPage = function(userId, page, pageLength, next) {
         entities.person.find(parseInt(userId)).success(function(thisPerson) {
             whereClause = ['person_id=?', thisPerson.id];
             entities.entry.all({
@@ -137,21 +209,55 @@ var Model = function() {
             ).success(function(theseEntries) {
                 if (theseEntries) {
                     for (var i = 0; i < theseEntries.length; i++) {
-                        theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('MMM DD, YYYY hh:mm a');
-                        theseEntries[i].updatedAt = moment(new Date(theseEntries[i].updatedAt)).format('MMM DD, YYYY hh:mm a');
+                        theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('hh:mm A. MM/DD/YYYY');
+                        theseEntries[i].updatedAt = moment(new Date(theseEntries[i].updatedAt)).format('MM/DD/YYYY hh:mm a');
                     }
-                    util.puts('found');            
                     next(theseEntries);
                 }
                 else {
                  theseEntries = [];
-                 next(theseEntries);      
+                 next(theseEntries);
                 }
             })
              .error(function(error, next) {
                 util.puts('error: ' + error);
                 next();
                 })
+        });
+    }
+
+    this.dbSearchEntries = function(userId, verb, quantifier, adjective, noun, comment, page, pageLength, next) {
+        util.puts('pageLength: ' + pageLength);
+        entities.person.find(parseInt(userId)).success(function(thisPerson) {
+            whereClause = ['person_id=? AND verb LIKE ? AND quantifier LIKE ? AND adjective LIKE ? AND noun LIKE ? AND comment LIKE ?'
+            , thisPerson.id
+            , verb
+            , quantifier
+            , adjective
+            , noun
+            , comment];
+            entities.entry.all({
+                where: whereClause
+                , offset: pageLength*(parseInt(page)-1)
+                , limit: pageLength
+                , order: 'createdAt DESC'
+            }).success(function(theseEntries) {
+                if (theseEntries) {
+                    for (var i = 0; i < theseEntries.length; i++) {
+                        theseEntries[i].createdAt = moment(new Date(theseEntries[i].createdAt)).format('hh:mm A. MM/DD/YYYY');
+                        theseEntries[i].updatedAt = moment(new Date(theseEntries[i].updatedAt)).format('MM/DD/YYYY hh:mm a');
+                    }
+                    next(theseEntries);
+                }
+                else {
+                    theseEntries = [];
+                    next(theseEntries);
+                }
+            })
+            .error(function(error, next) {
+                util.puts('error: ' + error);
+                next();
+            })
         });
     }
 }
