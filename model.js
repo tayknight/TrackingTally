@@ -35,8 +35,22 @@ var Model = function() {
     });
 
     client.query('USE '+credentials.database);
+    
+    /*this.dbFindUser = function(id, next) {
+        entities.person.find(id).success(function(thisPerson) {
+            if (thisPerson) {
+                next(null, thisPerson);
+            }
+            else {
+                next(null, null);
+            }
+        }).failure(function(err) {
+            next (err, null);
+        });
+    }*/
 
-    this.findUserById = function(id, next) {
+    this.dbFindUserById = function(id, next) {
+        util.puts('finding: ' + id);
         var sql = "SELECT P.firstname \
             , P.lastname \
             , P.email \
@@ -47,16 +61,20 @@ var Model = function() {
             , P.identifier \
             , P.username \
             FROM tt_persons P \
-            WHERE P.id = ?";
+            WHERE P.id = ? \
+            LIMIT 1";
         client.query(
             sql
             , [id]
             , function (err, results, fields) {
                 if (err) {
-                    throw err;
+                    //throw err;
+                    util.puts(err);
+                    return next(err, null);
                 }
-                console.log(results);
-                return next(results);
+                //console.log(results);
+                util.puts(results);
+                return next(null, results);
             })
     }
 
@@ -119,21 +137,10 @@ var Model = function() {
     entities.person = this.Person;
     entities.entry = this.Entry;
 
-    this.dbFindUser = function(id, next) {
-        entities.person.find(id).success(function(thisPerson) {
-            if (thisPerson) {
-                next(null, thisPerson);
-            }
-            else {
-                next(null, null);
-            }
-        }).failure(function(err) {
-            next (err, null);
-        });
-    }
+    
 
-    this.findUserByProviderUsername = function(provider, twitterMetadata, next) {
-        identifier = twitterMetadata.id,
+    this.findOrCreateUserByProviderUsername = function(provider, twitterMetadata, next) {
+        identifier = twitterMetadata.id;
         var sql = "SELECT P.id \
             FROM tt_persons P  \
             WHERE P.provider = ? \
@@ -143,13 +150,23 @@ var Model = function() {
             , [provider, identifier]
             , function (err, results, fields) {
                 if (err) {
-                    throw err;
+                    //throw err;
+                    console.log('findOrCreateUserByProviderUsername: error in initial fetch');
+                    
+                    next(err, null);
                 }
                 
                 if (results.length > 0) {
                     // found a user, return
-                    console.log(results);
-                    return next(results);   
+                    //console.log(results);
+                    if (provider == 'twitter') {
+                        console.log('findOrCreateUserByProviderUsername: creating twitter username');
+                    }else
+                    {
+                        results.username = results.username;
+                    }
+                    console.log('findOrCreateUserByProviderUsername: user found');
+                    return next(null, results);
                 }
                 else {
                     insertSql = "INSERT INTO tt_persons \
@@ -161,7 +178,7 @@ var Model = function() {
                         , provider \
                         , identifier \
                         , username) \
-                        VALUES (
+                        VALUES ( \
                         ?, ?, ?, NOW(), NOW(), 'twitter', ?, ?);";
                     client.query(
                         insertSql
@@ -172,12 +189,16 @@ var Model = function() {
                         , 'twitter'
                         , twitterMetadata.identifier
                         , twitterMetadata.username
-                        ]
+                        ],
                         function(err, results, fields) {
                             if (err) {
-                                throw err;
+                                //throw err;
+                                console.log('findOrCreateUserByProviderUsername: error in new user insert');
+                                next(err, null);
                             }
-                            return next(results);   
+                            
+                            console.log('findOrCreateUserByProviderUsername: found inserted');
+                            return next(null, results);
                         }
                     )
                 }                                

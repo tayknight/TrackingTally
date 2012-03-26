@@ -11,165 +11,34 @@ var util = require('util')
   , model = require('./model.js')
   , moment = require('moment')
   , everyauth = require('everyauth')
-  //, passport = require('passport')
-  //, FacebookStrategy = require('passport-facebook').Strategy
-  //, GoogleStrategy = require('passport-google').Strategy
-
-//everyauth.debug = true;
   
 var connect = require('connect')
+
+var db = new model();
+
+var defaultEntriesPageLength = 10;
+
+var app = module.exports = express.createServer();
 
 everyauth.twitter
     .consumerKey('cVdVyEXIjetxWqTjcVcdWg')
     .consumerSecret('169LM6w2KHyU1PLlLHVSj2Bhdb2BnMiEEoy7a4hv9M8')
     .findOrCreateUser(function(session, accessToken, accessTokenSecret, twitterUserMetadata) {
         var provider = 'twitter';
-        var promise = this.Promise();
-        
-        db.dbFindOrCreateUser(provider, twitterUserMetadata, function(err, user) {
+        var promise = this.Promise();        
+        db.findOrCreateUserByProviderUsername(provider, twitterUserMetadata, function(err, user) {
             if (err) return promise.fulfill([err]);
+            console.log('about to fulfill user promise');
             promise.fulfill(user);
         })
         return promise;
     })
     .redirectPath('/');
 
-/*everyauth.password
-    .getLoginPath('/login')
-    .postLoginPath('/login')
-    .loginView('login')
-    .authenticate( function (login, password) {
-        //var promise = this.Promise();
-        var user = {};
-        user.id = 1;
-        //promise.fulfill(user);
-        //return promise;
-        return user;
-    })
-    .loginSuccessRedirect('/')
-    .getRegisterPath('/register')
-    .postRegisterPath('/register')
-    .registerView('register')
-    .validateRegistration(function(newUserAttributes) {
-    
-    })
-    .registerUser(function( newUserAttributes ) {
-    
-    })
-    .registerSuccessRedirect('/')
-*/
 everyauth.everymodule.findUserById( function(userId, callback) {
-    db.dbFindUser(userId, callback);
+    console.log('in findUserById for user: ' + userId);
+    db.dbFindUserById(userId, callback);
 });    
-
-// everyauth.facebook
-    // .appId('380922881926658')
-    // .appSecret('3b3303e818306a9656fa2ccea7b7d0f5')
-    // .handleAuthCallbackError(function(req,res) {
-        // console.log('in handleAuthCallback Error');
-    // })
-    // .findOrCreateUser( function (session, accessToken, accessTokExtra, fbUserMetadata) {
-        // console.log(fbUserMetadata);
-        // //Verifies if user in database already
-        // try{
-            // var id = fbUserMetadata.id;
-            // var promise = this.Promise();
-            // /*User.findOne({ fbid: id}, function(err, result) {
-                // var user;
-                // if(!result) {
-                    // user = new User();
-                    // user.fbid = id;
-                    // user.firstName = fbUserMetadata.first_name;
-                    // user.lastName = fbUserMetadata.last_name;
-                    // user.save();
-                // } else 
-                    // user = result;
-                // }
-                // promise.fulfill(user);
-            // });*/
-            // var user = {};
-            // user.id = fbUserMetadata.id;
-            // user.firstName = fbUserMetadata.first_name;
-            // user.lastName = fbUserMetadata.last_name;
-            // promise.fulfill(user);
-            // return promise;
-        // }
-        // catch(err){
-        // console.log(err);
-        // }
-    // })
-    // .redirectPath('/')
-    // //.entryPath('/auth/facebook')
-    // //.callbackPath('/auth/facebook/callback')
-    // //.scope('email')
-    // //.fields('id,name,email');
-  
-
-/*passport.use(new GoogleStrategy({
-    returnURL: 'http://localhost:1581/auth/google/return',
-    realm: 'http://localhost:1581/'
-    },
-    function(identifier, profile, done) {
-        console.log('got back:');
-        console.log(identifier);
-        console.log(profile);
-        console.log('finding user.');
-        user = {id: 2};
-        //findOrCreate({ openId: identifier }, function (err, user) {
-        return done(null, user);
-        //});
-    }
-));
-
-function findOrCreate(identifier, err, next) {
-    console.log('here');
-    next(err, identifier);
-}
-*/  
-var db = new model();
-
-var defaultEntriesPageLength = 10;
-
-// Passport session setup.
-//   To support persistent login sessions, Passport needs to be able to
-//   serialize users into and deserialize users out of the session.  Typically,
-//   this will be as simple as storing the user ID when serializing, and finding
-//   the user by ID when deserializing.
-/*passport.serializeUser(function(user, done) {
-  done(null, user.id);
-});
-
-passport.deserializeUser(function(id, done) {
-  //findById(id, function (err, user) {
-    done(null, user);
-  //});
-});
-*/
-
-// Use the LocalStrategy within Passport.
-//   Strategies in passport require a `verify` function, which accept
-//   credentials (in this case, a username and password), and invoke a callback
-//   with a user object.  In the real world, this would query a database;
-//   however, in this example we are using a baked-in set of users.
-/*passport.use(new LocalStrategy(
-  function(username, password, done) {
-    // asynchronous verification, for effect...
-    process.nextTick(function () {
-
-      // Find the user by username.  If there is no user with the given
-      // username, or the password is not correct, set the user to `false` to
-      // indicate failure.  Otherwise, return the authenticated `user`.
-      findByUsername(username, function(err, user) {
-        if (err) { return done(err); }
-        if (!user) { return done(null, false); }
-        if (user.password != password) { return done(null, false); }
-        return done(null, user);
-      })
-    });
-  }
-));*/
-
-var app = module.exports = express.createServer();
 
 // Configuration
 
@@ -199,6 +68,7 @@ app.configure('production', function(){
 
 app.get('/', ensureAuthenticated, function(req, res) {
     //res.render('user', {user: req.user});
+    console.log(req.user);
     res.redirect('/' + req.user.username);
 })
 
