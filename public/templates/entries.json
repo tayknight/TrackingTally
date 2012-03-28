@@ -13,10 +13,20 @@
       <div class="row-fluid entrymeta">  
         <div class="span12 btn-group">
           <a class="btn disabled">
-            <i class="icon-eye-open" />
-              &nbsp;
-            <i class="icon-map-marker" />
-              &nbsp;
+            {{#isPublic}}
+              <i class="icon-eye-open" />
+            {{/isPublic}}
+            {{#isNotPublic}}
+              <i class="icon-eye-close" />
+            {{/isNotPublic}}
+            &nbsp;
+            {{#hasLocation}}
+              <i class="icon-map-marker" />
+            {{/hasLocation}}
+            {{#hasNoLocation}}
+              <i class="icon-ban-circle" />
+            {{/hasNoLocation}}
+            &nbsp;
             {{createdAt}}
           </a>
           <a class="btn">
