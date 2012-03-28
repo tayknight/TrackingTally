@@ -8,14 +8,15 @@
 var util = require('util')
   , fs = require('fs')
   , express = require('express')
-  , routes = require('./routes')  
+  , routes = require('./routes')
   , model = require('./model.js')
   , moment = require('moment')
   //, everyauth = require('everyauth')
   , credentials = require('./credentials.js')
   , passport = require('passport')
   , TwitterStrategy = require('passport-twitter').Strategy
-  
+  , cons = require('consolidate')
+
 var connect = require('connect')
 
 var db = new model();
@@ -25,6 +26,7 @@ var defaultEntriesPageLength = 10;
 var app = module.exports = express.createServer();
 
 app.sharedPartials = [];
+app.sharedHoganPartials = [];
 
 passport.use(new TwitterStrategy({
   consumerKey: credentials.TWITTER_CONSUMER_KEY,
@@ -38,7 +40,7 @@ passport.use(new TwitterStrategy({
       return done(err);
     }
     done(null, user);
-    })    
+    })
   }
 ));
 
@@ -55,7 +57,7 @@ passport.deserializeUser(function(obj, done) {
   .consumerSecret('169LM6w2KHyU1PLlLHVSj2Bhdb2BnMiEEoy7a4hv9M8')
   .findOrCreateUser(function(session, accessToken, accessTokenSecret, twitterUserMetadata) {
     var provider = 'twitter';
-    var promise = this.Promise();    
+    var promise = this.Promise();
     db.findOrCreateUserByProviderUsername(provider, twitterUserMetadata, function(err, user) {
       if (err) return promise.fulfill([err]);
       console.log('about to fulfill user promise');
@@ -83,6 +85,9 @@ app.configure(function(){
   app.use(app.router)
 });
 
+var routes = {};
+routes.hoganCompiler = require('./app/hoganCompiler');
+
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
@@ -103,6 +108,10 @@ app.get('/templates.json', function(req,res) {
   res.json(app.sharedPartials);
 });
 
+app.get('/hogan_templates.json', function(req,res) {
+  res.json(app.sharedHoganPartials);
+});
+
 // Redirect the user to Twitter for authentication.  When complete, Twitter
 // will redirect the user back to the application at
 // /auth/twitter/callback
@@ -112,7 +121,7 @@ app.get('/auth/twitter', passport.authenticate('twitter'));
 // authentication process by attempting to obtain an access token.  If
 // access was granted, the user will be logged in.  Otherwise,
 // authentication has failed.
-app.get('/auth/twitter/callback', 
+app.get('/auth/twitter/callback',
   passport.authenticate('twitter', { successRedirect: '/',
                    failureRedirect: '/users/login' }));
 
@@ -120,6 +129,9 @@ app.get('/', ensureAuthenticated, function(req, res) {
   //res.render('user', {user: req.user});
   res.redirect('/' + req.user['username']);
 })
+
+// Hogan precompile
+app.get('/templates.js', routes.hoganCompiler.getAll);
 
 app.get('/:username', ensureAuthenticated, function(req,res) {
   res.render('user', {user: req.user});
@@ -133,26 +145,31 @@ app.get('/users/login', function(req, res){
   res.render('login', { user: req.user });
 });
 
-app.get('/:user/entries/find/', ensureAuthenticated, function(req,res) {
+//app.get('/:user/entries/find/', ensureAuthenticated, function(req,res) {
+app.get('/:user/entries/', ensureAuthenticated, function(req,res) {
   var user = req.query['user'];
   var u = req.user.id;
-  var p = req.query['page'] || 1;
-  var count = req.query['count'] || defaultEntriesPageLength;  
+  var page = req.query['page'] || 1;
+  var count = req.query['count'] || defaultEntriesPageLength;
   var verb = req.query['verb'] || '%';
   var quantifier = req.query['quantifier'] || '%';
   var adjective = req.query['adjective'] || '%';
   var noun = req.query['noun'] || '%';
   var comment = req.query['comment'] || '%';
-  
-  db.dbSearchEntries(req.user.id, verb, quantifier, adjective, noun, comment, p, count, function(err, theseEntries) {
-    res.json({layout: false
-          , entriesCount: 1
-          , entries: theseEntries
-          , requested: p
-          , defaultEntriesPageLength: count
-          , requestedDisplay: null
-          , todayDisplay: null
-          });
+
+  db.dbSearchEntries(req.user.id, verb, quantifier, adjective, noun, comment, page, count, true, function(err, theseEntries, totalCount) {
+    if ( req.headers["x-requested-with"] === "XMLHttpRequest" ) {
+      res.json({layout: false
+        , entriesCount: totalCount
+        , entries: theseEntries
+        , requested: page
+        , defaultEntriesPageLength: count
+        , totalPages: Math.ceil(parseInt(totalCount) / parseInt(count))
+      });
+    } else {
+      res.render('user', {user: req.user});
+    }
+    
       /*res.render('entries', {layout: false
           , entriesCount: 1
           , entries: theseEntries
@@ -161,8 +178,8 @@ app.get('/:user/entries/find/', ensureAuthenticated, function(req,res) {
           , requestedDisplay: null
           , todayDisplay: null
           })*/
-         
-    })  
+
+    })
 });
 
 /*app.get('/:user/entries/find/', function(req,res) {
@@ -176,7 +193,7 @@ app.get('/:user/entries/find/', ensureAuthenticated, function(req,res) {
   var adjective = req.query.adjective || '%';
   var noun = req.query.noun || '%';
   var comment = req.query.comment || '%';
-  
+
   // get the user's number of entries
   db.dbGetNumberOfEntries(u, function(entriesCount) {
     if (entriesCount > 0) {
@@ -201,7 +218,7 @@ app.get('/:user/entries/find/', ensureAuthenticated, function(req,res) {
         , requestedDisplay: null
         , todayDisplay: null
       })
-    } 
+    }
   })
 });
 */
@@ -220,11 +237,11 @@ app.get( '/:user/entries/user/:id/:date', function( req, res ) {
       , requestedDisplay: moment(new Date(thisDate)).format(dateFormat)
       , todayDisplay: moment(new Date(today)).format(dateFormat)
       });
-  });  
+  });
 });
- 
+
 // and for post data...
-app.post('/update', ensureAuthenticated, function( req, res ) {  
+app.post('/update', ensureAuthenticated, function( req, res ) {
   if (req.body.verb) {
     var query = db.Person.find(parseInt(req.user.id));
     query.on('success', function(result) {
@@ -253,7 +270,7 @@ app.post('/update', ensureAuthenticated, function( req, res ) {
 // update templates
 app.get('/templates/update', ensureAuthenticated, function(req,res) {
   // only I can refresh
-  if (req.user.username == 'tayknight') {  
+  if (req.user.username == 'tayknight') {
     err = null;
     recompileTemplates(err, function(err, next) {
       if (err) {
@@ -288,18 +305,25 @@ function ensureAuthenticated(req, res, next) {
 // recompile the templates
 function recompileTemplates(err, next) {
   app.sharedPartials = [];
+  app.sharedHoganPartials = [];
+  
+  // compile Hogan templates
 
   util.puts('recompiling templates');
   fs.readdir("./public/templates", function (err, filenames) {
     var i;
-    
+
     for (i = 0; i < filenames.length; i++) {
-      var functionName = filenames[i].substr(0, filenames[i].lastIndexOf("."))      
+      var functionName = filenames[i].substr(0, filenames[i].lastIndexOf("."))
       , fileContents = fs.readFileSync("./public/templates/" + filenames[i], "utf8");
       util.puts('recompiling template ' + functionName);
       app.sharedPartials.push({
         name: functionName
         , template: fileContents
+      });
+      app.sharedHoganPartials.push({
+        name: functionName
+        , template: fileContents.toString()
       });
     }
   });

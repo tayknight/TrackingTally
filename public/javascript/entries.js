@@ -1,42 +1,24 @@
 var currentUserEntries;
 
-var getEntriesTemplate = function(err, next) {
-  $.getJSON('/templates.json', function(templates) { 
-    //console.log(templates);
-    a = templates;
-    $.each(templates, function(key, value) {
-      ich.addTemplate('entries', value.template);
-      next();
-    });
-  });
-};
-
 var getUsersEntries =  function(pageNum, queryString) {
+  // if there is a queryString, we need to parse it for values. 
+  // The presence of a queryString indicates:
+  // 1. a search result set is being paged throught
+  // 2. a URL is being directly navigated to.
   $("#entriesDisplay").html();
   queryString = queryString || 'q=1';
   username = $('#entryForm').data('username');
   pageNum = pageNum || 1;
   $.ajax({
-    url: '/' + username + '/entries/find/?' + queryString
+    url: '/' + username + '/entries/?' + queryString + '&page=' + pageNum
     , type: 'get'
     , success: function(data) {
           currentUserEntries = data;
-          //$("#entriesDisplay").html(data);
-          if (ich.entries != undefined ) {
-            $("#entriesDisplay").html(ich.entries(currentUserEntries, true));
-            initializeEntryClickHandler();
+          entriesList = new Hogan.Template(T.entries_template);
+          $("#entriesDisplay").html(entriesList.render(data));
+          initializeEntryClickHandler();
             makePagination(pageNum, parseInt($('#entriesPagination').data('entries-count')));
-            window.history.replaceState(null, 'pagination change', '/' + username + '/entries/page/' + pageNum)
-          }
-          else {
-            err = null;
-            getEntriesTemplate(err, function() {
-              $("#entriesDisplay").html(ich.entries(currentUserEntries, true));
-              initializeEntryClickHandler();
-              makePagination(pageNum, parseInt($('#entriesPagination').data('entries-count')));
-              window.history.replaceState(null, 'pagination change', '/' + username + '/entries/page/' + pageNum)
-            })
-          }          
+            History.replaceState(null, '', '/' + username + '/entries/?' + queryString + '&page=' + pageNum)          
         }
   });
 }
@@ -113,7 +95,7 @@ var initializeSearchHandler = function() {
     var noun = $('#entrynoun').val();
     var comment = $('#entrycomment').val();
     
-    var querystring = '?q=1';
+    var querystring = '';
     if (verb.length > 0) {
       querystring += "&verb=" + encodeURIComponent(verb);
     }
@@ -127,10 +109,10 @@ var initializeSearchHandler = function() {
       querystring += "&noun=" + encodeURIComponent(noun);
     }
     if (comment.length > 0) {
-      querystring += "&quantifier=" + encodeURIComponent(comment);
+      querystring += "&comment=" + encodeURIComponent(comment);
     }
-    console.log('querystring: ' + querystring);
-    searchEntries(querystring);
+
+    getUsersEntries(1,querystring);
   });
 }
 
@@ -244,5 +226,6 @@ $.fn.clearForm = function() {
     this.checked = false;
     else if (tag == 'select')
     this.selectedIndex = -1;
+    getUsersEntries(1,'');
   });
 };

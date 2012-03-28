@@ -307,8 +307,40 @@ var Model = function() {
   });
   }
 
-  this.dbSearchEntries = function(userId, verb, quantifier, adjective, noun, comment, page, pageLength, next) {
+  this.dbSearchEntries = function(userId, verb, quantifier, adjective, noun, comment, page, pageLength, getCount, next) {
   console.log('limit ' + parseInt(pageLength*(parseInt(page)-1)) + ', ' + parseInt(pageLength));
+  
+  var totalCount = 0;
+  if (getCount) {
+    var countSql = "SELECT COUNT(*) as totalRecords \
+      FROM tt_entries E \
+      INNER JOIN tt_persons P on E.person_id = P.id \
+      WHERE P.id = ? \
+      AND verb LIKE ?  \
+      AND quantifier LIKE ?  \
+      AND adjective LIKE ?  \
+      AND noun LIKE ?  \
+      AND comment LIKE ?";
+    client.query(
+      countSql
+      , [userId
+    , verb
+    , quantifier
+    , adjective
+    , noun
+    , comment
+    ]
+    , function(err, results, fields) {
+      if (err) {
+        console.log('dbSearchEntries: error counting records');
+        next(err, null);
+      }
+      if (results.length > 0) {
+        totalCount = results[0].totalRecords;
+      }
+    })
+  }
+  
   var sql = "SELECT E.verb \
         , E.quantifier \
         , E.adjective \
@@ -363,7 +395,9 @@ var Model = function() {
         }
       }
       
-      return next(null, results);
+      ;
+      return next(null, results, totalCount);
+      
       }
     )
   };
