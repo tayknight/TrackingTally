@@ -15,7 +15,6 @@ var util = require('util')
   , credentials = require('./credentials.js')
   , passport = require('passport')
   , TwitterStrategy = require('passport-twitter').Strategy
-  , cons = require('consolidate')
 
 var connect = require('connect')
 
