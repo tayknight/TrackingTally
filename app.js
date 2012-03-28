@@ -30,7 +30,7 @@ app.sharedHoganPartials = [];
 passport.use(new TwitterStrategy({
   consumerKey: credentials.TWITTER_CONSUMER_KEY,
   consumerSecret: credentials.TWITTER_CONSUMER_SECRET,
-  callbackURL: "http://local.host:1581/auth/twitter/callback"
+  callbackURL: "http://dev.willcount.com/auth/twitter/callback"
   },
   function(token, tokenSecret, profile, done) {
   var provider = 'twitter';
