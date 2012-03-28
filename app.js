@@ -282,7 +282,7 @@ app.get('/templates/update', ensureAuthenticated, function(req,res) {
   }
 });
 
-var port = process.env.PORT || 1581;
+var port = process.env.PORT || process.env['app_port'] || 1581;
 app.listen(port);
 console.log("Express server listening on port %d in %s mode", port, app.settings.env);
 
