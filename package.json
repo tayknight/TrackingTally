@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "name": "willcount_dev"
   , "version": "0.0.1"
   , "private": true
@@ -13,3 +14,44 @@
     , "async": "*"
   }
 }
+=======
+  "name": "bcrypt",
+  "description": "A bcrypt library for NodeJS.",
+  "keywords": ["bcrypt","password","auth","authentication","encryption","crypt","crypto"],
+  "main": "./bcrypt",
+  "version": "0.5.0",
+  "author": "Nick Campbell (http://github.com/ncb000gt)",
+  "engines": { "node": ">= 0.6.0" },
+  "repository": {
+        "type": "git",
+        "url": "http://github.com/ncb000gt/node.bcrypt.js.git"
+   },
+   "licenses": [
+     {
+        "type": "MIT"
+     }
+   ],
+   "bugs": {
+     "url" : "http://github.com/ncb000gt/node.bcrypt.js/issues"
+   },
+   "scripts": {
+     "test": "make test"
+   },
+   "devDependencies": {
+     "nodeunit": ">=0.6.4"
+   },
+   "contributors": [
+     "Antonio Salazar Cardozo <savedfastcool@gmail.com> (https://github.com/Shadowfiend)",
+     "Van Nguyen <the.gol.effect@gmail.com> (https://github.com/thegoleffect)",
+     "David Trejo <david@dtrejo.com> (https://github.com/dtrejo)",
+     "Ben Glow <glen.low@pixelglow.com> (https://github.com/pixelglow)",
+     "NewITFarmer.com <> (https://github.com/newitfarmer)",
+     "Alfred Westerveld <alfredwesterveld@gmail.com> (https://github.com/alfredwesterveld)",
+     "Vincent Côté-Roy <vincentcr@gmail.com> (https://github.com/vincentcr)",
+     "Lloyd Hilaiel <lloyd@hilaiel.com> (https://github.com/lloyd)",
+     "Roman Shtylman <shtylman@gmail.com> (https://github.com/shtylman)",
+     "Vadim Graboys <dimva13@gmail.com> (https://github.com/vadimg)",
+     "Ben Noorduis <> (https://github.com/bnoordhuis)"
+   ]
+}
+>>>>>>> 082e257cbb5299cd0b5aedaea1d5162b723589c1

@@ -1,3 +1,11 @@
+<<<<<<< HEAD
 sequelizetest.js
 node_modules
 *.bak
+=======
+.lock*
+build
+*.node
+*.sw[a-z]
+node_modules
+>>>>>>> 082e257cbb5299cd0b5aedaea1d5162b723589c1
