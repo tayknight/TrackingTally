@@ -1,12 +1,21 @@
 var currentUserEntries;
 
 var getUsersEntries =  function(pageNum, queryString) {
+  thisDate = moment(new Date().toGMTString()).format('YYYY-MM-DD');
   // if there is a queryString, we need to parse it for values. 
   // The presence of a queryString indicates:
   // 1. a search result set is being paged throught
   // 2. a URL is being directly navigated to.
   $("#entriesDisplay").html();
-  queryString = queryString || 'q=1';
+  
+  if (queryString == undefined) {
+    queryString = 'q=1&d=' + thisDate;
+  }
+  else
+  {
+    queryString = queryString || 'q=1';
+  }
+  
   username = $('#entryForm').data('username');
   pageNum = pageNum || 1;
   $.ajax({

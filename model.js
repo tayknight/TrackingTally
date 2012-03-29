@@ -36,19 +36,6 @@ var Model = function() {
 
   client.query('USE '+credentials.database);
   
-  /*this.dbFindUser = function(id, next) {
-  entities.person.find(id).success(function(thisPerson) {
-    if (thisPerson) {
-    next(null, thisPerson);
-    }
-    else {
-    next(null, null);
-    }
-  }).failure(function(err) {
-    next (err, null);
-  });
-  }*/
-
   this.dbFindUserById = function(id, next) {
   util.puts('finding: ' + id);
   var sql = "SELECT P.id \
@@ -307,51 +294,91 @@ var Model = function() {
   });
   }
 
-  this.dbSearchEntries = function(userId, verb, quantifier, adjective, noun, comment, page, pageLength, getCount, next) {
-  console.log('limit ' + parseInt(pageLength*(parseInt(page)-1)) + ', ' + parseInt(pageLength));
-  
-  var totalCount = 0;
-  if (getCount) {
-    var countSql = "SELECT COUNT(*) as totalRecords \
-      FROM tt_entries E \
-      INNER JOIN tt_persons P on E.person_id = P.id \
-      WHERE P.id = ? \
-      AND verb LIKE ?  \
-      AND quantifier LIKE ?  \
-      AND adjective LIKE ?  \
-      AND noun LIKE ?  \
-      AND comment LIKE ?";
-    client.query(
-      countSql
-      , [userId
-    , verb
-    , quantifier
-    , adjective
-    , noun
-    , comment
-    ]
-    , function(err, results, fields) {
-      if (err) {
-        console.log('dbSearchEntries: error counting records');
-        next(err, null);
-      }
-      if (results.length > 0) {
-        totalCount = results[0].totalRecords;
-      }
-    })
+  this.dbSearchEntriesByDate = function(userId, thisDate, page, pageLength, getCount, next) {
+    var totalCount = 0;
+    if (getCount) {
+      var countSql = "SELECT COUNT(*) as totalRecords \
+        FROM tt_entries E \
+        INNER JOIN tt_persons P on E.person_id = P.id \
+        WHERE P.id = ? \
+        AND E.createdAt >= ? AND E.createdAt < ? + INTERVAL 1 DAY ";
+      client.query(
+        countSql
+        , [userId
+        , thisDate
+        , thisDate
+          ]
+      , function(err, results, fields) {
+        if (err) {
+          console.log('dbSearchEntriesByDate: error counting records');
+          next(err, null);
+        }
+        if (results.length > 0) {
+          totalCount = results[0].totalRecords;
+        }
+      })
+    }
+    var sql = "SELECT E.verb \
+          , E.quantifier \
+          , E.adjective \
+          , E.noun \
+          , E.latitude \
+          , E.longitude \
+          , E.public \
+          , E.comment \
+          , E.id as entry_id \
+          , E.createdAt \
+          , E.updatedAt \
+          , @rownum:=@rownum + 1 as row_num \
+          FROM tt_entries E \
+          INNER JOIN tt_persons P on E.person_id = P.id \
+          , (SELECT @rownum:=0) R \
+          WHERE P.id = ? \
+          AND E.createdAt >= ? AND E.createdAt < ? + INTERVAL 1 DAY \
+          ORDER BY E.createdAt DESC \
+          LIMIT ?,? ";
+      client.query(
+        sql
+        , [userId
+        , thisDate
+        , thisDate
+        , parseInt(pageLength*(parseInt(page)-1))
+        , parseInt(pageLength)
+          ]
+      , function(err, results, fields) {
+        if (err) {
+          //throw err;
+          console.log('dbSearchEntriesByDate: error in entries select: ' + err);
+          next(err, null);
+        }
+        
+        for (var i = 0; i < results.length; i++) {
+          if (results[i].public == 1) {
+            results[i].isPublic = true;
+          } 
+          else {
+            results[i].isNotPublic = true;
+          }
+          if (results[i].latitude && results[i].longitude) {
+            results[i].hasLocation = true;  
+          }
+          else {
+            results[i].hasNoLocation = true;
+          }
+        }
+        
+        ;
+        return next(null, results, totalCount);        
+        }
+      )
   }
   
-  var sql = "SELECT E.verb \
-        , E.quantifier \
-        , E.adjective \
-        , E.noun \
-        , E.latitude \
-        , E.longitude \
-        , E.public \
-        , E.comment \
-        , E.id as entry_id \
-        , E.createdAt \
-        , E.updatedAt \
+  this.dbSearchEntries = function(userId, verb, quantifier, adjective, noun, comment, page, pageLength, getCount, next) {
+    console.log('limit ' + parseInt(pageLength*(parseInt(page)-1)) + ', ' + parseInt(pageLength));
+    
+    var totalCount = 0;
+    if (getCount) {
+      var countSql = "SELECT COUNT(*) as totalRecords \
         FROM tt_entries E \
         INNER JOIN tt_persons P on E.person_id = P.id \
         WHERE P.id = ? \
@@ -359,47 +386,86 @@ var Model = function() {
         AND quantifier LIKE ?  \
         AND adjective LIKE ?  \
         AND noun LIKE ?  \
-        AND comment LIKE ? \
-        ORDER BY createdAt DESC \
-        LIMIT ?,? ";
-  client.query(
-    sql
-    , [userId
-    , verb
-    , quantifier
-    , adjective
-    , noun
-    , comment
-    , parseInt(pageLength*(parseInt(page)-1))
-    , parseInt(pageLength)
-    ]
-    , function(err, results, fields) {
-      if (err) {
-        //throw err;
-        console.log('dbSearchEntries: error in entries select: ' + err);
-        next(err, null);
-      }
-      
-      for (var i = 0; i < results.length; i++) {
-        if (results[i].public == 1) {
-          results[i].isPublic = true;
-        } 
-        else {
-          results[i].isNotPublic = true;
+        AND comment LIKE ?";
+      client.query(
+        countSql
+        , [userId
+      , verb
+      , quantifier
+      , adjective
+      , noun
+      , comment
+      ]
+      , function(err, results, fields) {
+        if (err) {
+          console.log('dbSearchEntries: error counting records');
+          next(err, null);
         }
-        if (results[i].latitude && results[i].longitude) {
-          results[i].hasLocation = true;  
+        if (results.length > 0) {
+          totalCount = results[0].totalRecords;
         }
-        else {
-          results[i].hasNoLocation = true;
+      })
+    }
+    
+    var sql = "SELECT E.verb \
+          , E.quantifier \
+          , E.adjective \
+          , E.noun \
+          , E.latitude \
+          , E.longitude \
+          , E.public \
+          , E.comment \
+          , E.id as entry_id \
+          , E.createdAt \
+          , E.updatedAt \
+          FROM tt_entries E \
+          INNER JOIN tt_persons P on E.person_id = P.id \
+          WHERE P.id = ? \
+          AND verb LIKE ?  \
+          AND quantifier LIKE ?  \
+          AND adjective LIKE ?  \
+          AND noun LIKE ?  \
+          AND comment LIKE ? \
+          ORDER BY createdAt DESC \
+          LIMIT ?,? ";
+    client.query(
+      sql
+      , [userId
+      , verb
+      , quantifier
+      , adjective
+      , noun
+      , comment
+      , parseInt(pageLength*(parseInt(page)-1))
+      , parseInt(pageLength)
+      ]
+      , function(err, results, fields) {
+        if (err) {
+          //throw err;
+          console.log('dbSearchEntries: error in entries select: ' + err);
+          next(err, null);
         }
-      }
-      
-      ;
-      return next(null, results, totalCount);
-      
-      }
-    )
+        
+        for (var i = 0; i < results.length; i++) {
+          if (results[i].public == 1) {
+            results[i].isPublic = true;
+          } 
+          else {
+            results[i].isNotPublic = true;
+          }
+          if (results[i].latitude && results[i].longitude) {
+            results[i].hasLocation = true;  
+          }
+          else {
+            results[i].hasNoLocation = true;
+          }
+        }
+        
+        ;
+        return next(null, results, totalCount);
+        
+        }
+      )
   };
   
   /*this.dbSearchEntries = function(userId, verb, quantifier, adjective, noun, comment, page, pageLength, next) {

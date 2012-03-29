@@ -33,11 +33,13 @@ var twitterConsumerSecret = '';
 var twitterCallbackURL = '';
 app.configure('development', function(){
   if (process.env['use_local_twitter']) {
+    util.puts('using local_twitter development');
     twitterConsumerKey = credentials.TWITTER_CONSUMER_KEY_LOCAL;
     twitterConsumerSecret = credentials.TWITTER_CONSUMER_SECRET_LOCAL;
     twitterCallbackURL = 'http://local.host:1581/auth/twitter/callback';
   }
   else {
+    util.puts('using remote_twitter development');
     twitterConsumerKey = credentials.TWITTER_CONSUMER_KEY_DEV;
     twitterConsumerSecret = credentials.TWITTER_CONSUMER_SECRET_DEV;
     twitterCallbackURL = 'http://dev.willcount.com/auth/twitter/callback';
@@ -45,6 +47,7 @@ app.configure('development', function(){
 })
 
 app.configure('production', function(){
+  util.puts('using remote_twitter production');
   twitterConsumerKey = credentials.TWITTER_CONSUMER_KEY_PROD;
   twitterConsumerSecret = credentials.TWITTER_CONSUMER_SECRET_PROD;
   twitterCallbackURL = 'http://www.willcount.com/auth/twitter/callback';
@@ -171,6 +174,8 @@ app.get('/users/login', function(req, res){
 app.get('/:user/entries/', ensureAuthenticated, function(req,res) {
   var user = req.query['user'];
   var u = req.user.id;
+  var method = req.query['method'] || 'date';
+  var date = req.query['d'] || moment(new Date().toGMTString()).format('YYYY-MM-DD');
   var page = req.query['page'] || 1;
   var count = req.query['count'] || defaultEntriesPageLength;
   var verb = req.query['verb'] || '%';
@@ -179,29 +184,39 @@ app.get('/:user/entries/', ensureAuthenticated, function(req,res) {
   var noun = req.query['noun'] || '%';
   var comment = req.query['comment'] || '%';
 
-  db.dbSearchEntries(req.user.id, verb, quantifier, adjective, noun, comment, page, count, true, function(err, theseEntries, totalCount) {
-    if ( req.headers["x-requested-with"] === "XMLHttpRequest" ) {
-      res.json({layout: false
-        , entriesCount: totalCount
-        , entries: theseEntries
-        , requested: page
-        , defaultEntriesPageLength: count
-        , totalPages: Math.ceil(parseInt(totalCount) / parseInt(count))
-      });
-    } else {
-      res.render('user', {user: req.user});
-    }
-    
-      /*res.render('entries', {layout: false
-          , entriesCount: 1
+  if (method == 'date') {
+    //this.dbSearchEntriesByDate = function(userId, thisDate, page, pageLength, getCount, next) {
+    util.puts('search by date: ' + date + '; count: ' + count);
+    db.dbSearchEntriesByDate(req.user.id, date, page, count, true, function(err, theseEntries, totalCount) {
+      if ( req.headers["x-requested-with"] === "XMLHttpRequest" ) {
+        res.json({layout: false
+          , entriesCount: totalCount
           , entries: theseEntries
-          , requested: p
+          , requested: page
           , defaultEntriesPageLength: count
-          , requestedDisplay: null
-          , todayDisplay: null
-          })*/
-
+          , totalPages: Math.ceil(parseInt(totalCount) / parseInt(count))
+          });
+      } else {
+        res.render('user', {user: req.user});
+      }
     })
+  }
+  else
+  {
+    db.dbSearchEntries(req.user.id, verb, quantifier, adjective, noun, comment, page, count, true, function(err, theseEntries, totalCount) {
+      if ( req.headers["x-requested-with"] === "XMLHttpRequest" ) {
+        res.json({layout: false
+          , entriesCount: totalCount
+          , entries: theseEntries
+          , requested: page
+          , defaultEntriesPageLength: count
+          , totalPages: Math.ceil(parseInt(totalCount) / parseInt(count))
+          });
+      } else {
+        res.render('user', {user: req.user});
+      }
+    })
+  }
 });
 
 /*app.get('/:user/entries/find/', function(req,res) {
