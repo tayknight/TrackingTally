@@ -27,10 +27,33 @@ var app = module.exports = express.createServer();
 app.sharedPartials = [];
 app.sharedHoganPartials = [];
 
+// which set of Twitter keys to use
+var twitterConsumerKey = '';
+var twitterConsumerSecret = '';
+var twitterCallbackURL = '';
+app.configure('development', function(){
+  if (process.env['use_local_twitter']) {
+    twitterConsumerKey = credentials.TWITTER_CONSUMER_KEY_LOCAL;
+    twitterConsumerSecret = credentials.TWITTER_CONSUMER_SECRET_LOCAL;
+    twitterCallbackURL = 'http://local.host:1581/auth/twitter/callback';
+  }
+  else {
+    twitterConsumerKey = credentials.TWITTER_CONSUMER_KEY_DEV;
+    twitterConsumerSecret = credentials.TWITTER_CONSUMER_SECRET_DEV;
+    twitterCallbackURL = 'http://dev.willcount.com/auth/twitter/callback';
+  }
+})
+
+app.configure('production', function(){
+  twitterConsumerKey = credentials.TWITTER_CONSUMER_KEY_PROD;
+  twitterConsumerSecret = credentials.TWITTER_CONSUMER_SECRET_PROD;
+  twitterCallbackURL = 'http://www.willcount.com/auth/twitter/callback';
+})
+
 passport.use(new TwitterStrategy({
-  consumerKey: credentials.TWITTER_CONSUMER_KEY,
-  consumerSecret: credentials.TWITTER_CONSUMER_SECRET,
-  callbackURL: "http://dev.willcount.com/auth/twitter/callback"
+  consumerKey: twitterConsumerKey,
+  consumerSecret: twitterConsumerSecret,
+  callbackURL: twitterCallbackURL
   },
   function(token, tokenSecret, profile, done) {
   var provider = 'twitter';
