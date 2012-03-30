@@ -48,8 +48,8 @@ app.configure('development', function(){
 
 app.configure('production', function(){
   util.puts('using remote_twitter production');
-  twitterConsumerKey = credentials.TWITTER_CONSUMER_KEY_PROD;
-  twitterConsumerSecret = credentials.TWITTER_CONSUMER_SECRET_PROD;
+  twitterConsumerKey = credentials.TWITTER_CONSUMER_KEY_DEV;
+  twitterConsumerSecret = credentials.TWITTER_CONSUMER_KEY_DEV;
   twitterCallbackURL = 'http://www.willcount.com/auth/twitter/callback';
 })
 
