@@ -73,7 +73,7 @@ passport.serializeUser(function(user, done) {
   done(null, user);
 });
 
-passport.deserializeUser(function(obj, done) {
+passport.deserializeUser(function(obj, done) {    
   done(null, obj);
 });
 
@@ -172,10 +172,18 @@ app.get('/users/login', function(req, res){
 
 //app.get('/:user/entries/find/', ensureAuthenticated, function(req,res) {
 app.get('/:user/entries/', ensureAuthenticated, function(req,res) {
+
+  var baseDate = null;
+  if (req.query['d']) {
+    baseDate = moment(req.query['d']);
+  }
+  else {
+    baseDate = moment().utc();
+  }    
+
   var user = req.query['user'];
   var u = req.user.id;
   var method = req.query['method'] || 'date';
-  var date = req.query['d'] || moment(new Date().toGMTString()).format('YYYY-MM-DD');
   var page = req.query['page'] || 1;
   var count = req.query['count'] || defaultEntriesPageLength;
   var verb = req.query['verb'] || '%';
@@ -183,11 +191,22 @@ app.get('/:user/entries/', ensureAuthenticated, function(req,res) {
   var adjective = req.query['adjective'] || '%';
   var noun = req.query['noun'] || '%';
   var comment = req.query['comment'] || '%';
+    
+  var previousDate = moment(baseDate);
+  var nextDate = moment(baseDate);
+  
+  previousDate.add('d', -1);  
+  nextDate.add('d', 1);
 
   if (method == 'date') {
     //this.dbSearchEntriesByDate = function(userId, thisDate, page, pageLength, getCount, next) {
-    util.puts('search by date: ' + date + '; count: ' + count);
-    db.dbSearchEntriesByDate(req.user.id, date, page, count, true, function(err, theseEntries, totalCount) {
+    db.dbSearchEntriesByDate(req.user.id, baseDate.format('YYYY-MM-DD'), page, count, true, function(err, theseEntries, totalCount) {      
+      if (theseEntries.length == 0) {
+        theseEntries.push({isEmpty: true});
+      }
+      else {
+        theseEntries.hasData = true;
+      }
       if ( req.headers["x-requested-with"] === "XMLHttpRequest" ) {
         res.json({layout: false
           , entriesCount: totalCount
@@ -195,6 +214,9 @@ app.get('/:user/entries/', ensureAuthenticated, function(req,res) {
           , requested: page
           , defaultEntriesPageLength: count
           , totalPages: Math.ceil(parseInt(totalCount) / parseInt(count))
+          , requestedDate: baseDate.format('YYYY-MM-DD')
+          , previousDate: previousDate.format('YYYY-MM-DD')
+          , nextDate: nextDate.format('YYYY-MM-DD')
           });
       } else {
         res.render('user', {user: req.user});
@@ -211,6 +233,9 @@ app.get('/:user/entries/', ensureAuthenticated, function(req,res) {
           , requested: page
           , defaultEntriesPageLength: count
           , totalPages: Math.ceil(parseInt(totalCount) / parseInt(count))
+          , requestedDate: baseDate.format('YYYY-MM-DD')
+          , previousDate: previousDate
+          , nextDate: nextDate
           });
       } else {
         res.render('user', {user: req.user});
@@ -264,7 +289,6 @@ app.get( '/:user/entries/user/:id/:date', function( req, res ) {
   u = req.user.id;
   d = req.params.date;
   var thisDate = new Date(req.params.date);
-  util.puts(thisDate);
   dateFormat = 'MMM DD, YYYY';
   db.dbSelectEntries(u, thisDate, function(theseEntries) {
     res.render('entries', {layout: false
@@ -283,7 +307,7 @@ app.post('/update', ensureAuthenticated, function( req, res ) {
     var query = db.Person.find(parseInt(req.user.id));
     query.on('success', function(result) {
       var entry = db.Entry.build({
-        person_id: req.user.id
+        personId: req.user.id
         , verb: req.body.verb
         , quantifier: req.body.quantifier
         , adjective: req.body.adjective

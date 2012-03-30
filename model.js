@@ -37,7 +37,6 @@ var Model = function() {
   client.query('USE '+credentials.database);
   
   this.dbFindUserById = function(id, next) {
-  util.puts('finding: ' + id);
   var sql = "SELECT P.id \
     , P.firstname \
     , P.lastname \
@@ -238,7 +237,6 @@ var Model = function() {
     limit: 1000
     }
     ).success(function(theseEntries) {
-    util.puts('found');
     next(theseEntries);
     })
      .error(function(error, next) {
@@ -255,7 +253,6 @@ var Model = function() {
     where: whereClause
     }
     ).success(function(entriesCount) {
-    util.puts('found');
     next(entriesCount);
     })
      .error(function(error, next) {

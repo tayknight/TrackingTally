@@ -68,10 +68,9 @@ script(src='/javascript/moment.min.js')
 script(src='/javascript/jquery.query.js')
 script(src='/javascript/ICanHaz.min.js')
 script
-  var today = new Date();
-  dateFormat = 'MMM DD, YYYY';
   getUserLocation();
   getUsersEntries();
+  initializeDayClickHandler()
   initializeSaveHandler();
   initializeCancelHandler();
   initializeSearchHandler();

@@ -1,8 +1,31 @@
 <ul class="unstyled entrylist well">
-  <li class="entriesPager">
-    <div id="entriesPagination" data-entries-count={{entriesCount}} data-requested={{requested}} data-total-pages={{totalPages}}></div>
+  <li>
+    <div id="entriesDateDisplay" class="pagination pagination-centered" data-entries-count={{entriesCount}} data-requested={{requested}} data-total-pages={{totalPages}} data-requestedDate={{requestedDate}}>
+      <ul>
+        <li>
+          <a class="navigateDay" data-navigation-date={{previousDate}}>
+            <i class="icon-chevron-left" />
+          </a>
+        </li>
+        <li class="disabled">
+          <a href="#">{{requestedDate}}</a>
+        </li>
+        <li>
+          <a class="navigateDay" data-navigation-date={{nextDate}}>
+            <i class="icon-chevron-right" />
+          </a>
+        </li>
+      </ul
+    </div>    
+    </div>
   </li>
+  <!--<li class="entriesPager">
+    <div id="entriesPagination"></div>
+  </li>-->  
   {{#entries}}
+    {{#isEmpty}}
+      Nothing found.
+    {{/isEmpty}}
     <li>
       <div class='row-fluid'>
         <div class="span12">

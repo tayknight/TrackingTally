@@ -1,7 +1,7 @@
 var currentUserEntries;
 
 var getUsersEntries =  function(pageNum, queryString) {
-  thisDate = moment(new Date().toGMTString()).format('YYYY-MM-DD');
+  thisDate = moment().utc().format('YYYY-MM-DD');
   // if there is a queryString, we need to parse it for values. 
   // The presence of a queryString indicates:
   // 1. a search result set is being paged throught
@@ -17,6 +17,7 @@ var getUsersEntries =  function(pageNum, queryString) {
   }
   
   username = $('#entryForm').data('username');
+  requestedDate = $('#entriesPagination').data('requestedDate')
   pageNum = pageNum || 1;
   $.ajax({
     url: '/' + username + '/entries/?' + queryString + '&page=' + pageNum
@@ -26,8 +27,9 @@ var getUsersEntries =  function(pageNum, queryString) {
           entriesList = new Hogan.Template(T.entries_template);
           $("#entriesDisplay").html(entriesList.render(data));
           initializeEntryClickHandler();
-            makePagination(pageNum, parseInt($('#entriesPagination').data('entries-count')));
-            History.replaceState(null, '', '/' + username + '/entries/?' + queryString + '&page=' + pageNum)          
+          //makePagination(pageNum, requestedDate, parseInt($('#entriesPagination').data('entries-count')));
+          initializeDayClickHandler()
+          History.replaceState(null, '', '/' + username + '/entries/?' + queryString + '&page=' + pageNum)          
         }
   });
 }
@@ -58,6 +60,12 @@ var placeExistingEntry = function(thisData) {
 
 var initializeEntryClickHandler = function() {
   $('.placeEntry').click(function() { placeExistingEntry($(this).data()) })
+}
+
+var initializeDayClickHandler = function() {
+  $('.navigateDay').click(function() { 
+    getUsersEntries(1, 'd=' + $(this).data('navigation-date'));
+  })
 }
 
 var initializeSaveHandler = function() {
@@ -125,98 +133,99 @@ var initializeSearchHandler = function() {
   });
 }
 
-var makePagination = function(requested, total_entries) {
+var makePagination = function(requested, requestedDate, totalEntries) {
   var requested = parseInt(requested);
-  var total_entries = parseInt(total_entries);
+  var totalEntries = parseInt(totalEntries);
   var limit = 10;
-  var total_pages = Math.ceil(total_entries/limit);
+  var totalPages = Math.ceil(totalEntries/limit);
   var previous = requested - 1;
   var next = requested + 1;
-  var totalminusone = total_pages - 1;
+  var totalminusone = totalPages - 1;
+  var requestedDate = requestedDate;
   
   //$('#entriesPagination').append("<div class='pagination'><ul>");
-  var parent_ul = $("<ul></ul>");
+  var parentUl = $("<ul></ul>");
 
-  if (total_pages <= 1) {
-    parent_ul.append('<li class="disabled"><a href="#">1</a></li>');
+  if (totalPages <= 1) {
+    parentUl.append('<li class="disabled"><a href="#">1</a></li>');
   }  
-  else if (total_pages > 1) {    
-    if (total_pages < 6) { // dont' bother paginating
-      for (var counter = 1; counter <= total_pages; counter++) {
+  else if (totalPages > 1) {    
+    if (totalPages < 6) { // dont' bother paginating
+      for (var counter = 1; counter <= totalPages; counter++) {
         if (counter == requested) {
-          parent_ul.append('<li class="active"><a>' + counter + '</a></li>');
+          parentUl.append('<li class="active"><a>' + counter + '</a></li>');
         }
         else {
-          parent_ul.append('<li><a>' + counter + '</a></li>');
+          parentUl.append('<li><a>' + counter + '</a></li>');
         }
       }
     }   
-    else if (total_pages >= 6) {
+    else if (totalPages >= 6) {
       // beginning. only hide later pages.
       if (requested < 5) {
         for (var counter = 1; counter <= 5; counter++) {
           if (counter == requested) {
-            parent_ul.append('<li class="active"><a>' + counter + '</a></li>');
+            parentUl.append('<li class="active"><a>' + counter + '</a></li>');
           }
           else {
-            parent_ul.append('<li><a>' + counter + '</a></li>');
+            parentUl.append('<li><a>' + counter + '</a></li>');
           }
         }
-        parent_ul.append('<li class="disabled"><a>...</a></li>');
-        parent_ul.append('<li><a href="#">' + total_pages + '</a></li>');
+        parentUl.append('<li class="disabled"><a>...</a></li>');
+        parentUl.append('<li><a href="#">' + totalPages + '</a></li>');
       }
       // in middle; hide some front and back
-      else if ( total_pages - 3 > requested) {
-        parent_ul.append('<li><a href="#">1</a></li>');
-        parent_ul.append('<li class="disabled"><a>...</a></li>');
+      else if ( totalPages - 3 > requested) {
+        parentUl.append('<li><a href="#">1</a></li>');
+        parentUl.append('<li class="disabled"><a>...</a></li>');
         for (var counter = requested-1; counter < (requested + 2); counter++) {
           if (counter == requested) {
-            parent_ul.append('<li class="active"><a>' + counter + '</a></li>');
+            parentUl.append('<li class="active"><a>' + counter + '</a></li>');
           }
           else {
-            parent_ul.append('<li><a>' + counter + '</a></li>');
+            parentUl.append('<li><a>' + counter + '</a></li>');
           }
         }
-        parent_ul.append('<li class="disabled"><a>...</a></li>');
-        parent_ul.append('<li><a href="#">' + total_pages + '</a></li>');
+        parentUl.append('<li class="disabled"><a>...</a></li>');
+        parentUl.append('<li><a href="#">' + totalPages + '</a></li>');
       }
       // close to the end; only hide early pages
       else {
-        parent_ul.append('<li><a href="#">1</a></li>');
-        parent_ul.append('<li class="disabled"><a>...</a></li>');
-        for (var counter = total_pages - 4; counter <= total_pages; counter++) {
+        parentUl.append('<li><a href="#">1</a></li>');
+        parentUl.append('<li class="disabled"><a>...</a></li>');
+        for (var counter = totalPages - 4; counter <= totalPages; counter++) {
           if (counter == requested) {
-            parent_ul.append('<li class="active"><a>' + counter + '</a></li>');
+            parentUl.append('<li class="active"><a>' + counter + '</a></li>');
           }
           else {
-            parent_ul.append('<li><a>' + counter + '</a></li>');
+            parentUl.append('<li><a>' + counter + '</a></li>');
           }
         }
       }
     }
     else {
-      parent_ul.append('<li><a href="#">1</a></li>');
-      parent_ul.append('<li><a href="#">2</a></li>');
-      parent_ul.append('<li><a href="#">3</a></li>');
-      for (var counter = total_pages; counter <= total_pages; counter++) {
+      parentUl.append('<li><a href="#">1</a></li>');
+      parentUl.append('<li><a href="#">2</a></li>');
+      parentUl.append('<li><a href="#">3</a></li>');
+      for (var counter = totalPages; counter <= totalPages; counter++) {
         if (counter == requested) {
-          parent_ul.append('<li class="counter"><a href="#">' + counter + '</a></li>');
+          parentUl.append('<li class="counter"><a href="#">' + counter + '</a></li>');
         }   
         else {
-          parent_ul.append('<li><a>' + counter + '</a></li>');
+          parentUl.append('<li><a>' + counter + '</a></li>');
         }
       }
-      if (requested < total_pages - 1){
-        parent_ul.append('<li><a href="#">Next</a></li>');
+      if (requested < totalPages - 1){
+        parentUl.append('<li><a href="#">Next</a></li>');
       }
       else {
-        parent_ul.append('<li class="disabled"><a href="#">Next</a></li>');
+        parentUl.append('<li class="disabled"><a href="#">Next</a></li>');
       }
     }
   }
-  var pagination_div = $('<div class="pagination"></div>');
-  pagination_div.append(parent_ul);
-  $('#entriesPagination').append(pagination_div);
+  var paginationDiv = $('<div class="pagination"></div>');
+  paginationDiv.append(parentUl);
+  $('#entriesPagination').append(paginationDiv);
   
   // attach click handler to each pagination unit
   $('#entriesPagination > div.pagination > ul > li > a').click(function() { 
