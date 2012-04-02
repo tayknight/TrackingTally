@@ -93,7 +93,7 @@ var Model = function() {
   port: 3306
   })
 
-  this.Person = sequelize.define('tt_person', {
+  /*this.Person = sequelize.define('tt_person', {
   firstname: Sequelize.STRING,
   lastname: Sequelize.STRING,
   email: Sequelize.STRING,
@@ -123,7 +123,7 @@ var Model = function() {
   entities.entry = this.Entry;
 
   
-
+  */
   this.findOrCreateUserByProviderUsername = function(provider, twitterMetadata, next) {
   identifier = twitterMetadata.id;
   var sql = "SELECT P.id \

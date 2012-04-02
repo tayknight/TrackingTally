@@ -71,9 +71,11 @@ var initializeDayClickHandler = function() {
 var initializeSaveHandler = function() {
   var t = $('#today').html();
   var fetchDate = moment(new Date(t)).format('YYYY-MM-DD');
-  $('#entryForm').submit(function() {
+  //$('#entryForm').submit(function(event) {
+  $('#submitButton').click(function() {
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    //event.preventDefault(); 
+    console.log('here');
     
     var verb = $('#entryverb').val();
     var quantifier = $('#entryquantifier').val();
